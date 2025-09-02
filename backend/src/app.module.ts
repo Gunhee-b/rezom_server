@@ -11,7 +11,6 @@ import { DefineModule } from './modules/define/define.module';
 import { AnswersModule } from './modules/answers/answers.module';
 import { CommentsModule } from './modules/comments/comments.module';
 import { ScheduleModule } from '@nestjs/schedule';
-import { JobsModule } from './jobs/jobs.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { EventsModule } from './modules/events/events.module';
 import { PingController } from './ping.controller';
