@@ -1,2 +1,0 @@
-  resetToken     String?   @unique
-  resetTokenExp  DateTime?

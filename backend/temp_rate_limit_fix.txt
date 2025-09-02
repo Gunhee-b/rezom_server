@@ -1,6 +1,0 @@
-import { safeRedisOperation } from '../helpers/redis.helper';
-
-# this.redis.client 직접 호출을 safeRedisOperation으로 변경
-sed -i 's/this\.redis\.client\.ttl(key)/safeRedisOperation(this.redis, (client) => client.ttl(key), -2)/g' src/common/guards/rate-limit.guard.ts
-sed -i 's/this\.redis\.client\.incr(key)/safeRedisOperation(this.redis, (client) => client.incr(key), 0)/g' src/common/guards/rate-limit.guard.ts  
-sed -i 's/this\.redis\.client\.expire(key, this\.window)/safeRedisOperation(this.redis, (client) => client.expire(key, this.window), null)/g' src/common/guards/rate-limit.guard.ts
