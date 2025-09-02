@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { AdminLayout } from '@/components/AdminLayout';
 import { useAdminAuth } from '@/hooks';
 
 export function SimpleTop5Page() {
@@ -165,26 +165,26 @@ export function SimpleTop5Page() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Link to="/dashboard" className="text-blue-600 hover:text-blue-800">← Back to Dashboard</Link>
-              <h1 className="text-xl font-semibold">Top-5 Questions Manager</h1>
-            </div>
-            <button 
-              onClick={saveTop5}
-              disabled={saving || selectedQuestions.length === 0}
-              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50"
-            >
-              {saving ? 'Saving...' : 'Update Top-5'}
-            </button>
-          </div>
+    <AdminLayout title="Top-5 Questions Manager">
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <select 
+            value={category} 
+            onChange={(e) => setCategory(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+            {categories.map(cat => (
+              <option key={cat.value} value={cat.value}>{cat.label}</option>
+            ))}
+          </select>
+          <button 
+            onClick={saveTop5}
+            disabled={saving || selectedQuestions.length === 0}
+            className="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-md font-medium transition-colors"
+          >
+            {saving ? 'Saving...' : 'Update Top-5'}
+          </button>
         </div>
-      </div>
-      
-      <div className="max-w-7xl mx-auto py-6 px-4">
         <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded">
           <p className="text-sm text-blue-800">
             <strong>Current Top-5:</strong> Questions with IDs {selectedQuestions.map(q => q.id).join(', ')} 
@@ -194,17 +194,6 @@ export function SimpleTop5Page() {
           </p>
         </div>
 
-        <div className="mb-6">
-          <select 
-            value={category} 
-            onChange={(e) => setCategory(e.target.value)}
-            className="px-3 py-2 border rounded"
-          >
-            {categories.map(cat => (
-              <option key={cat.value} value={cat.value}>{cat.label}</option>
-            ))}
-          </select>
-        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-white shadow rounded-lg">
@@ -300,6 +289,6 @@ export function SimpleTop5Page() {
           </div>
         </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 }

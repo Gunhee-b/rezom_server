@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { AdminLayout } from '@/components/AdminLayout';
 import { useAdminAuth } from '@/hooks';
 
 export function SimpleQuestionsPage() {
@@ -79,25 +79,16 @@ export function SimpleQuestionsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Link to="/dashboard" className="text-blue-600 hover:text-blue-800">← Back to Dashboard</Link>
-              <h1 className="text-xl font-semibold">Questions Management</h1>
-            </div>
-            <button 
-              onClick={() => setShowCreateForm(!showCreateForm)}
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            >
-              Create Question
-            </button>
-          </div>
+    <AdminLayout title="Questions Management">
+      <div className="space-y-6">
+        <div className="flex justify-end">
+          <button 
+            onClick={() => setShowCreateForm(!showCreateForm)}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition-colors"
+          >
+            {showCreateForm ? 'Cancel' : 'Create Question'}
+          </button>
         </div>
-      </div>
-      
-      <div className="max-w-7xl mx-auto py-6 px-4 space-y-6">
         {showCreateForm && (
           <div className="bg-white shadow rounded-lg p-6">
             <h3 className="text-lg font-medium mb-4">Create New Question</h3>
@@ -182,6 +173,6 @@ export function SimpleQuestionsPage() {
           </div>
         </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 }

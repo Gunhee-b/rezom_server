@@ -1,5 +1,5 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import { LoginPage } from '@/routes/LoginPage2';
+import { LoginPage } from '@/routes/LoginPage';
 import { SimpleDashboard } from '@/routes/SimpleDashboard';
 import { SimpleQuestionsPage } from '@/routes/SimpleQuestionsPage';
 import { SimpleTop5Page } from '@/routes/SimpleTop5Page';
