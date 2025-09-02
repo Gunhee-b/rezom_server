@@ -1,7 +1,7 @@
 // src/lib/api.ts
 import { CSRF_HEADER, getCookie } from '@/utils/cookies';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'https://api.rezom.org';
+const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000';
 
 type Json = Record<string, unknown>;
 

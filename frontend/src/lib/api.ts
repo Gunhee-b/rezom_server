@@ -13,7 +13,7 @@ export async function api<TResp = unknown, TBody = unknown>(
   path: string,
   options: ApiOptions<TBody> = {}
 ): Promise<TResp> {
-  const base = import.meta.env.VITE_API_BASE_URL ?? 'https://api.rezom.org';
+  const base = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000';
 
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
 

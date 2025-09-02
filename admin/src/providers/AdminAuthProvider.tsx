@@ -49,8 +49,18 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   }, [saveAT]);
 
   const logout = useCallback(async () => {
-    try { await api('/auth/logout', { method: 'POST', withCredentials: true }); }
-    finally { saveAT(null); setUser(null); }
+    try { 
+      await api('/auth/logout', { method: 'POST', withCredentials: true }); 
+    } catch (error: any) {
+      // Ignore 401 errors during logout - token is already expired
+      if (error?.status !== 401) {
+        console.error('Logout error:', error);
+      }
+    }
+    finally { 
+      saveAT(null); 
+      setUser(null); 
+    }
   }, [saveAT]);
 
   // 부팅 시 /auth/me (있으면 세션 동기화)
@@ -63,11 +73,16 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
           accessToken,
         });
         setUser({ id: me.id, email: me.email, role: me.role });
-      } catch {
-        // 실패 시 조용히
+      } catch (error: any) {
+        // If auth fails (401), clear the expired token
+        if (error?.status === 401) {
+          console.log('Token expired, clearing authentication');
+          saveAT(null);
+          setUser(null);
+        }
       }
     })();
-  }, [accessToken]);
+  }, [accessToken, saveAT]);
 
   const value = useMemo<Ctx>(() => ({ user, accessToken, login, refresh, logout }), [user, accessToken, login, refresh, logout]);
 

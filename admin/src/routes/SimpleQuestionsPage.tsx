@@ -20,7 +20,7 @@ export function SimpleQuestionsPage() {
     setLoading(true);
     try {
       const categoryId = categories.find(c => c.value === category)?.id;
-      const response = await fetch(`https://api.rezom.org/questions?categoryId=${categoryId}`, {
+      const response = await fetch(`http://localhost:3000/questions?categoryId=${categoryId}`, {
         credentials: 'include',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -42,9 +42,15 @@ export function SimpleQuestionsPage() {
 
   const createQuestion = async () => {
     if (!newQuestion.title || !newQuestion.body) return;
+    if (!accessToken) {
+      alert('Please log in to create questions');
+      return;
+    }
+    
+    console.log('Creating question with token:', accessToken.substring(0, 20) + '...');
     
     try {
-      const response = await fetch('https://api.rezom.org/questions', {
+      const response = await fetch('http://localhost:3000/questions', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',

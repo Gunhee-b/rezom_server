@@ -20,7 +20,7 @@ export function SimpleTop5Page() {
     setLoading(true);
     try {
       const categoryId = category === 'language-definition' ? '1' : '2';
-      const response = await fetch(`https://api.rezom.org/questions?categoryId=${categoryId}`, {
+      const response = await fetch(`http://localhost:3000/questions?categoryId=${categoryId}`, {
         credentials: 'include',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -31,7 +31,7 @@ export function SimpleTop5Page() {
       setAllQuestions(questions || []);
 
       try {
-        const top5Response = await fetch(`https://api.rezom.org/define/${category}/top5`, {
+        const top5Response = await fetch(`http://localhost:3000/define/${category}/top5`, {
           credentials: 'include'
         });
         if (top5Response.ok) {
@@ -128,7 +128,7 @@ export function SimpleTop5Page() {
         try {
           console.log('Trying payload:', payload);
           
-          const response = await fetch(`https://api.rezom.org/admin/define/${category}/top5`, {
+          const response = await fetch(`http://localhost:3000/admin/define/${category}/top5`, {
             method: 'POST',
             headers,
             credentials: 'include',

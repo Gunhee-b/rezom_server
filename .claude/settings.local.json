@@ -48,7 +48,13 @@
       "Bash(open http://localhost:5173/users/me/questions)",
       "Bash(open http://localhost:5173/users/me)",
       "Bash(open http://localhost:5173/write?questionId=22)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(open:*)",
+      "Bash(docker:*)",
+      "Bash(npx prisma:*)",
+      "Bash(npm audit:*)",
+      "Bash(ps:*)",
+      "Bash(git log:*)"
     ],
     "deny": [],
     "ask": [],

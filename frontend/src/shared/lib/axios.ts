@@ -2,7 +2,7 @@ import axios, { AxiosHeaders } from 'axios'
 import { token } from './token'
 
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: 'http://localhost:3000',
   withCredentials: true,
 })
 
