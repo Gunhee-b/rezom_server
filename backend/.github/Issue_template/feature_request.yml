@@ -1,0 +1,38 @@
+name: "✨ Feature"
+description: 기능 개발 요청 (API/도메인 로직/웹훅 등)
+title: "feat: <기능 한 줄 요약>"
+labels: ["feature", "backend", "p1"]
+body:
+  - type: textarea
+    id: context
+    attributes:
+      label: 배경/목표(Why)
+      description: 이 기능이 필요한 이유와 사용자 시나리오
+      placeholder: ex) 오늘의 질문을 홈에서 노출하기 위해...
+  - type: textarea
+    id: scope
+    attributes:
+      label: 범위(What)
+      description: 엔드포인트, DTO, 상태코드, 권한, 예외
+      placeholder: ex) GET /questions/daily, 200/404, public
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: 수용 기준(DoD)
+      description: 검증 가능한 체크리스트
+      placeholder: |
+        - [ ] Swagger 문서화
+        - [ ] E2E 테스트 1개 이상
+        - [ ] 페이지네이션/정렬 동작 확인
+  - type: checkboxes
+    id: impacts
+    attributes:
+      label: 영향 범위
+      options:
+        - label: DB 스키마 변경
+        - label: 캐시/레이트리밋 영향
+        - label: 크론/웹훅 영향
+  - type: textarea
+    id: notes
+    attributes:
+      label: 기타/참고

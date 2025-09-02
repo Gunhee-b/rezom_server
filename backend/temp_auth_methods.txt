@@ -1,0 +1,55 @@
+  async requestPasswordReset(email: string) {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      // Don't reveal if user exists
+      return;
+    }
+
+    // Generate secure reset token
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetTokenExp = new Date(Date.now() + 3600000); // 1 hour from now
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { resetToken, resetTokenExp }
+    });
+
+    // Send email (implement your email service)
+    await this.sendResetEmail(user.email, resetToken);
+  }
+
+  async resetPassword(token: string, newPassword: string) {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        resetToken: token,
+        resetTokenExp: { gt: new Date() }
+      }
+    });
+
+    if (!user) {
+      throw new Error('Invalid or expired reset token');
+    }
+
+    // Hash new password
+    const passwordHash = await argon2.hash(newPassword);
+
+    // Update password and clear reset token
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        passwordHash,
+        resetToken: null,
+        resetTokenExp: null,
+        tokenVersion: user.tokenVersion + 1 // Invalidate existing sessions
+      }
+    });
+  }
+
+  private async sendResetEmail(email: string, token: string) {
+    // Implement your email service here
+    // For now, just log the reset link
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+    console.log(`Password reset link for ${email}: ${resetUrl}`);
+    
+    // TODO: Integrate with email service (SendGrid, AWS SES, etc.)
+  }

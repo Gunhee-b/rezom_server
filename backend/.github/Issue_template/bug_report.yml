@@ -1,0 +1,33 @@
+name: "🐞 Bug"
+description: 버그 리포트
+title: "fix: <버그 한 줄 요약>"
+labels: ["bug", "backend", "p0"]
+body:
+  - type: textarea
+    id: describe
+    attributes:
+      label: 현상
+      placeholder: 실제/기대 결과를 비교해서 작성
+  - type: textarea
+    id: repro
+    attributes:
+      label: 재현 절차
+      placeholder: 1) ... 2) ... 3) ...
+  - type: input
+    id: endpoint
+    attributes:
+      label: 관련 엔드포인트/모듈
+      placeholder: ex) GET /questions/daily, QuestionsModule
+  - type: textarea
+    id: logs
+    attributes:
+      label: 로그/스택트레이스
+      render: shell
+  - type: checkboxes
+    id: severity
+    attributes:
+      label: 심각도
+      options:
+        - label: 서비스 중단
+        - label: 데이터 손상 가능
+        - label: 기능 일부 불가

@@ -1,0 +1,264 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Answer {
+  id         Int       @id @default(autoincrement())
+  questionId Int
+  authorId   Int
+  title      String?   @db.VarChar(200)
+  body       String?   @db.VarChar(1500)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime
+  User       User      @relation(fields: [authorId], references: [id])
+  Question   Question  @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  Comment    Comment[]
+
+  @@index([authorId], map: "Answer_authorId_fkey")
+  @@index([questionId, createdAt], map: "idx_q_created")
+}
+
+model Category {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @default(now())
+  Question  Question[]
+
+  @@index([name])
+}
+
+model Comment {
+  id         Int       @id @default(autoincrement())
+  authorId   Int
+  questionId Int?
+  answerId   Int?
+  body       String
+  createdAt  DateTime  @default(now())
+  Answer     Answer?   @relation(fields: [answerId], references: [id], onDelete: Cascade)
+  User       User      @relation(fields: [authorId], references: [id])
+  Question   Question? @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@index([authorId], map: "Comment_authorId_fkey")
+  @@index([answerId, createdAt], map: "idx_a_created")
+  @@index([questionId, createdAt], map: "idx_q_created")
+}
+
+model Concept {
+  id                                        Int                  @id @default(autoincrement())
+  slug                                      String               @unique
+  title                                     String
+  description                               String?
+  createdById                               Int?
+  createdAt                                 DateTime             @default(now())
+  updatedAt                                 DateTime
+  User                                      User?                @relation(fields: [createdById], references: [id])
+  ConceptEdge_ConceptEdge_sourceIdToConcept ConceptEdge[]        @relation("ConceptEdge_sourceIdToConcept")
+  ConceptEdge_ConceptEdge_targetIdToConcept ConceptEdge[]        @relation("ConceptEdge_targetIdToConcept")
+  ConceptKeyword                            ConceptKeyword[]
+  QuestionConcept                           QuestionConcept[]
+  QuestionSuggestion                        QuestionSuggestion[]
+  TopQuestion                               TopQuestion[]
+
+  @@index([createdById])
+}
+
+model ConceptEdge {
+  id                                    Int      @id @default(autoincrement())
+  sourceId                              Int
+  targetId                              Int
+  weight                                Float?
+  style                                 String?
+  createdAt                             DateTime @default(now())
+  Concept_ConceptEdge_sourceIdToConcept Concept  @relation("ConceptEdge_sourceIdToConcept", fields: [sourceId], references: [id], onDelete: Cascade)
+  Concept_ConceptEdge_targetIdToConcept Concept  @relation("ConceptEdge_targetIdToConcept", fields: [targetId], references: [id], onDelete: Cascade)
+
+  @@unique([sourceId, targetId])
+  @@index([sourceId, targetId])
+  @@index([targetId], map: "ConceptEdge_targetId_fkey")
+}
+
+model ConceptKeyword {
+  id                Int               @id @default(autoincrement())
+  conceptId         Int
+  keyword           String
+  position          Int
+  active            Boolean           @default(true)
+  currentQuestionId Int?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime
+  Concept           Concept           @relation(fields: [conceptId], references: [id], onDelete: Cascade)
+  Question          Question?         @relation(fields: [currentQuestionId], references: [id])
+  QuestionKeyword   QuestionKeyword[]
+
+  @@unique([conceptId, keyword])
+  @@unique([conceptId, position])
+  @@index([conceptId])
+  @@index([currentQuestionId])
+}
+
+model Follow {
+  id                           Int      @id @default(autoincrement())
+  followerId                   Int
+  followeeId                   Int
+  createdAt                    DateTime @default(now())
+  User_Follow_followeeIdToUser User     @relation("Follow_followeeIdToUser", fields: [followeeId], references: [id], onDelete: Cascade)
+  User_Follow_followerIdToUser User     @relation("Follow_followerIdToUser", fields: [followerId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followeeId])
+  @@index([followeeId])
+}
+
+model Notification {
+  id        Int               @id @default(autoincrement())
+  userId    Int
+  type      Notification_type
+  payload   Json?
+  isRead    Boolean           @default(false)
+  createdAt DateTime          @default(now())
+  User      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead, createdAt], map: "idx_user_read")
+}
+
+model Profile {
+  id        Int     @id @default(autoincrement())
+  userId    Int     @unique
+  bio       String?
+  avatarUrl String?
+  links     Json?
+  User      User    @relation(fields: [userId], references: [id])
+}
+
+model Question {
+  id                 Int                  @id @default(autoincrement())
+  authorId           Int
+  categoryId         Int
+  title              String
+  body               String?              @db.VarChar(1000)
+  tags               Json?
+  isDaily            Boolean              @default(false)
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime
+  Answer             Answer[]
+  Comment            Comment[]
+  ConceptKeyword     ConceptKeyword[]
+  User               User                 @relation(fields: [authorId], references: [id])
+  Category           Category             @relation(fields: [categoryId], references: [id])
+  QuestionConcept    QuestionConcept[]
+  QuestionKeyword    QuestionKeyword?
+  QuestionSuggestion QuestionSuggestion[]
+  TopQuestion        TopQuestion?
+
+  @@index([authorId, createdAt], map: "idx_author")
+  @@index([categoryId, createdAt], map: "idx_category")
+}
+
+model QuestionConcept {
+  conceptId  Int
+  questionId Int
+  relation   QuestionConcept_relation @default(RELATED)
+  relevance  Float?
+  createdAt  DateTime                 @default(now())
+  Concept    Concept                  @relation(fields: [conceptId], references: [id], onDelete: Cascade)
+  Question   Question                 @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@id([conceptId, questionId])
+  @@index([questionId])
+}
+
+model QuestionKeyword {
+  id             BigInt         @id @default(autoincrement())
+  questionId     Int            @unique
+  keywordId      Int
+  createdAt      DateTime       @default(now())
+  ConceptKeyword ConceptKeyword @relation(fields: [keywordId], references: [id], onDelete: Cascade)
+  Question       Question       @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@index([keywordId])
+}
+
+model QuestionSuggestion {
+  id               Int                       @id @default(autoincrement())
+  conceptId        Int
+  createdById      Int?
+  keywords         Json
+  prompt           String?
+  suggestion       String
+  status           QuestionSuggestion_status @default(PENDING)
+  linkedQuestionId Int?
+  createdAt        DateTime                  @default(now())
+  updatedAt        DateTime
+  Concept          Concept                   @relation(fields: [conceptId], references: [id], onDelete: Cascade)
+  User             User?                     @relation(fields: [createdById], references: [id])
+  Question         Question?                 @relation(fields: [linkedQuestionId], references: [id])
+
+  @@index([conceptId, status, createdAt])
+  @@index([createdById], map: "QuestionSuggestion_createdById_fkey")
+  @@index([linkedQuestionId], map: "QuestionSuggestion_linkedQuestionId_fkey")
+}
+
+model TopQuestion {
+  id         BigInt   @id @default(autoincrement())
+  conceptId  Int
+  questionId Int      @unique
+  rank       Int
+  createdAt  DateTime @default(now())
+  Concept    Concept  @relation(fields: [conceptId], references: [id], onDelete: Cascade)
+  Question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([conceptId, rank])
+  @@index([conceptId, rank])
+}
+
+model User {
+  id                             Int                  @id @default(autoincrement())
+  email                          String               @unique
+  passwordHash                   String
+  displayName                    String
+  role                           User_role            @default(USER)
+  createdAt                      DateTime             @default(now())
+  updatedAt                      DateTime
+  refreshTokenHash               String?
+  tokenVersion                   Int                  @default(0)
+  Answer                         Answer[]
+  Comment                        Comment[]
+  Concept                        Concept[]
+  Follow_Follow_followeeIdToUser Follow[]             @relation("Follow_followeeIdToUser")
+  Follow_Follow_followerIdToUser Follow[]             @relation("Follow_followerIdToUser")
+  Notification                   Notification[]
+  Profile                        Profile?
+  Question                       Question[]
+  QuestionSuggestion             QuestionSuggestion[]
+  resetToken     String?   @unique
+  resetTokenExp  DateTime?
+}
+
+enum Notification_type {
+  FOLLOW
+  ANSWER
+  COMMENT
+  SYSTEM
+}
+
+enum QuestionConcept_relation {
+  RELATED
+  INSPIRES
+  CONTRASTS
+}
+
+enum User_role {
+  USER
+  ADMIN
+}
+
+enum QuestionSuggestion_status {
+  PENDING
+  APPROVED
+  REJECTED
+}

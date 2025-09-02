@@ -1,0 +1,22 @@
+● nginx.service - The nginx HTTP and reverse proxy server
+     Loaded: loaded (/usr/lib/systemd/system/nginx.service; enabled; preset: disabled)
+     Active: active (running) since Sat 2025-08-16 13:24:34 UTC; 1 week 3 days ago
+   Main PID: 778576 (nginx)
+      Tasks: 3 (limit: 9345)
+     Memory: 5.1M
+        CPU: 6.211s
+     CGroup: /system.slice/nginx.service
+             ├─502828 "nginx: worker process"
+             ├─502830 "nginx: worker process"
+             └─778576 "nginx: master process /usr/sbin/nginx"
+
+Aug 27 04:57:12 ip-172-31-2-92.ap-northeast-2.compute.internal systemd[1]: Reloading nginx.service - The nginx HTTP and reverse proxy server...
+Aug 27 04:57:12 ip-172-31-2-92.ap-northeast-2.compute.internal nginx[489638]: nginx: [warn] the "listen ... http2" directive is deprecated, use the "http2" directive instead in /etc/nginx/conf.d/rezom.conf:10
+Aug 27 04:57:12 ip-172-31-2-92.ap-northeast-2.compute.internal nginx[489638]: nginx: [warn] the "listen ... http2" directive is deprecated, use the "http2" directive instead in /etc/nginx/conf.d/rezom.conf:21
+Aug 27 04:57:12 ip-172-31-2-92.ap-northeast-2.compute.internal nginx[489638]: nginx: [warn] protocol options redefined for 0.0.0.0:443 in /etc/nginx/conf.d/rezom.conf:21
+Aug 27 04:57:12 ip-172-31-2-92.ap-northeast-2.compute.internal systemd[1]: Reloaded nginx.service - The nginx HTTP and reverse proxy server.
+Aug 27 05:41:40 ip-172-31-2-92.ap-northeast-2.compute.internal systemd[1]: Reloading nginx.service - The nginx HTTP and reverse proxy server...
+Aug 27 05:41:40 ip-172-31-2-92.ap-northeast-2.compute.internal nginx[502804]: nginx: [warn] the "listen ... http2" directive is deprecated, use the "http2" directive instead in /etc/nginx/conf.d/rezom.conf:10
+Aug 27 05:41:40 ip-172-31-2-92.ap-northeast-2.compute.internal nginx[502804]: nginx: [warn] the "listen ... http2" directive is deprecated, use the "http2" directive instead in /etc/nginx/conf.d/rezom.conf:21
+Aug 27 05:41:40 ip-172-31-2-92.ap-northeast-2.compute.internal nginx[502804]: nginx: [warn] protocol options redefined for 0.0.0.0:443 in /etc/nginx/conf.d/rezom.conf:21
+Aug 27 05:41:40 ip-172-31-2-92.ap-northeast-2.compute.internal systemd[1]: Reloaded nginx.service - The nginx HTTP and reverse proxy server.

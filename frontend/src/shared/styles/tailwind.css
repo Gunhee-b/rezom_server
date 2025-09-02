@@ -1,0 +1,35 @@
+/* src/shared/styles/tailwind.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 여기에 프로젝트 전역 스타일을 추가 가능 */
+
+/* Live Update Animations */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-slideDown {
+  animation: slideDown 0.3s ease-out;
+}
+
+.animate-pulse-slow {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
