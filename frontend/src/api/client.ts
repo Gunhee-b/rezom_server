@@ -11,7 +11,7 @@ type ApiOptions = {
   // ❌ process.env 제거, ✅ Vite에서는 import.meta.env 사용
   const API_BASE =
     (import.meta as any)?.env?.VITE_API_BASE_URL ??
-    'https://api.rezom.org';
+    'http://localhost:3000';
   
   function buildQuery(q?: ApiOptions['query']) {
     if (!q) return '';

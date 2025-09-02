@@ -5,7 +5,7 @@ import { homeSchema } from './home.schema';
 import { TOKENS } from '@/shared/theme/tokens';
 import { Pt, quadPath } from '@/shared/lib/svg';
 import LoginSection from '@/molecules/LoginSection';
-import { logout } from '@/shared/api/auth'; // ✅ 사용: 로그아웃 API
+import { useAuth } from '@/hooks/useAuth';
 
 const VIEWBOX_W = TOKENS.viewBox.w;
 const BASE_VINE = TOKENS.edge.map.green.width;
@@ -17,12 +17,13 @@ function centerOf(el: Element | null): Pt | null {
 }
 
 export default function HomePage() {
+  const { isAuthed, logout } = useAuth();
   const [openLogin, setOpenLogin] = useState(() => {
     // Auto-open login if redirected from auth error
     return !!sessionStorage.getItem('redirectAfterLogin');
   });
   const [logoFontPx, setLogoFontPx] = useState<number>(TOKENS.typography.logo.size);
-  const [authed, setAuthed] = useState(() => localStorage.getItem('authed') === '1');
+  const authed = isAuthed;
 
   // overlay vine
   const [vineD, setVineD] = useState<string | null>(null);
@@ -70,14 +71,7 @@ export default function HomePage() {
     return () => window.removeEventListener('resize', calcWidth);
   }, []);
 
-  // ✅ storage 이벤트로 다른 탭/컴포넌트와 상태 동기화
-  useEffect(() => {
-    const onStorage = (e: StorageEvent) => {
-      if (e.key === 'authed') setAuthed(e.newValue === '1');
-    };
-    window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
-  }, []);
+  // Storage sync is now handled by useAuth hook
 
   // 섹션 보이면(미로그인일 때) ReZom→Login 경로 계산 & 드로우
   useEffect(() => {
@@ -137,8 +131,6 @@ export default function HomePage() {
   const toggleLogin = () => setOpenLogin((v) => !v);
 
   const handleLoginSuccess = () => {
-    localStorage.setItem('authed', '1');
-    setAuthed(true);
     setOpenLogin(false);
     setDrawVine(false);
     
@@ -156,8 +148,6 @@ export default function HomePage() {
     } catch {
       // 네트워크 실패해도 클라이언트 상태는 정리
     } finally {
-      localStorage.removeItem('authed');
-      setAuthed(false);
       setOpenLogin(false);
       // 로그아웃 직후 경로 재계산(덩굴 다시 보여주기)
       requestAnimationFrame(() => {

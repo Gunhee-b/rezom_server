@@ -1,5 +1,5 @@
 // prisma/seed.ts
-import { PrismaClient, UserRole } from '@prisma/client';
+import { PrismaClient, User_role } from '@prisma/client';
 import * as argon2 from 'argon2';
 
 const prisma = new PrismaClient();
@@ -29,7 +29,8 @@ async function main() {
       email: 'demo@rezom.org',
       passwordHash,
       displayName: 'Rezom Demo',
-      role: UserRole.USER,
+      role: User_role.USER,
+      updatedAt: new Date(),
       // Profile 모델이 존재할 때만 사용하세요.
       // profile: { create: { bio: 'Hello Rezom', links: [{ url: 'https://rezom.org' }] as any } },
     },
@@ -39,8 +40,8 @@ async function main() {
   const adminPw = await argon2.hash(process.env.SEED_ADMIN_PASSWORD ?? 'Admin!2345');
   await prisma.user.upsert({
     where: { email: 'admin@rezom.org' },
-    update: { displayName: 'Rezom Admin', role: UserRole.ADMIN, passwordHash: adminPw },
-    create: { email: 'admin@rezom.org', passwordHash: adminPw, displayName: 'Rezom Admin', role: UserRole.ADMIN },
+    update: { displayName: 'Rezom Admin', role: User_role.ADMIN, passwordHash: adminPw, updatedAt: new Date() },
+    create: { email: 'admin@rezom.org', passwordHash: adminPw, displayName: 'Rezom Admin', role: User_role.ADMIN, updatedAt: new Date() },
   });
 
   // 3) Create Concepts for /define functionality
@@ -69,6 +70,7 @@ async function main() {
       create: {
         ...conceptData,
         createdById: demo.id,
+        updatedAt: new Date(),
       },
     });
   }
@@ -99,6 +101,7 @@ async function main() {
         create: {
           conceptId: languageConcept.id,
           ...kw,
+          updatedAt: new Date(),
         },
       });
     }
@@ -115,6 +118,7 @@ async function main() {
         body: '신념의 뿌리를 찾고 연결해보세요.',
         isDaily: true,
         tags: ['daily', 'belief'] as any, // Json 필드
+        updatedAt: new Date(),
       },
     });
   }

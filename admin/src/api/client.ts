@@ -7,9 +7,7 @@ type ApiOptions = {
     accessToken?: string;
   };
   
-  const API_BASE =
-    (import.meta as any)?.env?.VITE_API_BASE_URL ||
-    'https://api.rezom.org';
+  const API_BASE = 'http://localhost:3000';
   
   function buildQuery(q?: ApiOptions['query']) {
     if (!q) return '';

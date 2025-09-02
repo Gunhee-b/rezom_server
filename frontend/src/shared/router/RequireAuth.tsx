@@ -1,8 +1,7 @@
 import { Navigate, Outlet } from 'react-router-dom'
-import { token } from '@/shared/lib/token'
+import { useAuth } from '@/hooks/useAuth'
 
 export default function RequireAuth() {
-  const authed = localStorage.getItem('authed') === '1'
-  const hasAccess = !!token.get()
-  return authed && hasAccess ? <Outlet /> : <Navigate to="/" replace />
+  const { isAuthed } = useAuth()
+  return isAuthed ? <Outlet /> : <Navigate to="/" replace />
 }

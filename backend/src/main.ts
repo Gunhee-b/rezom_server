@@ -72,7 +72,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
 
   app.enableCors({
-    origin: ALLOWLIST.length ? ALLOWLIST : [/\.rezom\.org$/],
+    origin: ALLOWLIST.length ? ALLOWLIST : ['http://localhost:5173', 'http://localhost:5174'],
     credentials: true,
   });
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { login } from '@/shared/api/auth'
+import { useAuth } from '@/hooks/useAuth'
 import { Link } from 'react-router-dom'
 
 type Props = {
@@ -16,6 +16,7 @@ const LoginSection = React.forwardRef<HTMLButtonElement, Props>(function LoginSe
   { authed = false, open, onToggle, onSuccess, onLogout, buttonFontPx = 20, panelScale = 1 }: Props,
   ref
 ) {
+  const { login, logout: authLogout } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -27,7 +28,7 @@ const LoginSection = React.forwardRef<HTMLButtonElement, Props>(function LoginSe
     setLoading(true)
     setError(null)
     try {
-      await login({ email, password })
+      await login(email, password)
       onSuccess()
     } catch {
       setError('로그인에 실패했습니다.')
@@ -37,10 +38,14 @@ const LoginSection = React.forwardRef<HTMLButtonElement, Props>(function LoginSe
   }
 
   const handleClickLogout = async () => {
-    if (!onLogout || logoutLoading) return
+    if (logoutLoading) return
     setLogoutLoading(true)
     try {
-      await onLogout()
+      if (onLogout) {
+        await onLogout()
+      } else {
+        await authLogout()
+      }
     } finally {
       setLogoutLoading(false)
     }

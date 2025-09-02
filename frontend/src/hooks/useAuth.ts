@@ -78,7 +78,8 @@ export function useAuth() {
     (async () => {
       if (!accessToken) return;
       try {
-        const me = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/me`, {
+        const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+        const me = await fetch(`${baseUrl}/auth/me`, {
           headers: { Authorization: `Bearer ${accessToken}` },
           credentials: 'include',
         });
