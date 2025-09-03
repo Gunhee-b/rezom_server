@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../infrastructure/prisma/prisma.service';
 import { CreateQuestionDto } from './dto/create-question.dto';
+import { UpdateQuestionDto } from './dto/update-question.dto';
 
 @Injectable()
 export class QuestionsService {
@@ -44,6 +45,59 @@ export class QuestionsService {
 
   async findOne(id: number) {
     return this.prisma.question.findUnique({
+      where: { id },
+    });
+  }
+
+  async getDailyQuestion() {
+    // Get a random question from the database
+    const count = await this.prisma.question.count();
+    if (count === 0) {
+      return { question: "What defines your purpose today?" };
+    }
+    
+    const randomOffset = Math.floor(Math.random() * count);
+    const question = await this.prisma.question.findMany({
+      skip: randomOffset,
+      take: 1,
+      select: {
+        id: true,
+        title: true,
+        body: true,
+      }
+    });
+    
+    if (question.length > 0) {
+      return { question: question[0] };
+    }
+    
+    return { question: "What defines your purpose today?" };
+  }
+
+  async update(id: number, dto: UpdateQuestionDto) {
+    const updateData: any = {
+      updatedAt: new Date(),
+    };
+    
+    if (dto.title !== undefined) updateData.title = dto.title;
+    if (dto.body !== undefined) updateData.body = dto.body;
+    if (dto.content !== undefined) updateData.body = dto.content; // Map content to body
+    if (dto.tags !== undefined) updateData.tags = dto.tags;
+    
+    return this.prisma.question.update({
+      where: { id },
+      data: updateData,
+    });
+  }
+
+  async remove(id: number) {
+    // First delete related answers and comments
+    await this.prisma.answer.deleteMany({
+      where: { questionId: id }
+    });
+    
+    // Then delete the question
+    return this.prisma.question.delete({
       where: { id },
     });
   }

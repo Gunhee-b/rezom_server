@@ -54,7 +54,9 @@
       "Bash(npx prisma:*)",
       "Bash(npm audit:*)",
       "Bash(ps:*)",
-      "Bash(git log:*)"
+      "Bash(git log:*)",
+      "Bash(tree:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": [],

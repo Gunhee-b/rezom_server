@@ -1,6 +1,7 @@
-import { Controller, Get, Post, Body, Param, Query, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, Req, UseGuards, ForbiddenException } from '@nestjs/common';
 import { QuestionsService } from './questions.service';
 import { CreateQuestionDto } from './dto/create-question.dto';
+import { UpdateQuestionDto } from './dto/update-question.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Request } from 'express';
 
@@ -34,8 +35,49 @@ export class QuestionsController {
     return this.svc.findAll(catId);
   }
 
+  @Get('daily')
+  async getDaily() {
+    return this.svc.getDailyQuestion();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.svc.findOne(Number(id));
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put(':id')
+  async update(@Param('id') id: string, @Body() dto: UpdateQuestionDto, @Req() req: AuthedRequest) {
+    const userId = Number(req.user?.sub);
+    const questionId = Number(id);
+    
+    // Check if user owns this question
+    const question = await this.svc.findOne(questionId);
+    if (!question) {
+      throw new ForbiddenException('Question not found');
+    }
+    if (question.authorId !== userId) {
+      throw new ForbiddenException('You can only edit your own questions');
+    }
+    
+    return this.svc.update(questionId, dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  async remove(@Param('id') id: string, @Req() req: AuthedRequest) {
+    const userId = Number(req.user?.sub);
+    const questionId = Number(id);
+    
+    // Check if user owns this question
+    const question = await this.svc.findOne(questionId);
+    if (!question) {
+      throw new ForbiddenException('Question not found');
+    }
+    if (question.authorId !== userId) {
+      throw new ForbiddenException('You can only delete your own questions');
+    }
+    
+    return this.svc.remove(questionId);
   }
 }

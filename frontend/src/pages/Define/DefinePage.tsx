@@ -155,6 +155,7 @@ export default function DefinePage() {
     navigate(`/define/${conceptSlug}${newSearch ? `?${newSearch}` : ''}`, { replace: true });
   };
 
+
   if (isLoading) {
     return (
       <div className="pt-6">

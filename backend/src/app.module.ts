@@ -10,6 +10,7 @@ import { QuestionsModule } from './modules/questions/questions.module';
 import { DefineModule } from './modules/define/define.module';
 import { AnswersModule } from './modules/answers/answers.module';
 import { CommentsModule } from './modules/comments/comments.module';
+import { InsightsModule } from './modules/insights/insights.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AdminModule } from './modules/admin/admin.module';
 import { EventsModule } from './modules/events/events.module';
@@ -28,6 +29,7 @@ import { PingController } from './ping.controller';
     DefineModule,
     AnswersModule, // +
     CommentsModule, // +
+    InsightsModule, // +
     ScheduleModule.forRoot(),
 //    JobsModule,
     

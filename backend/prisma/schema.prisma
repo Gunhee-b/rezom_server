@@ -114,6 +114,19 @@ model Follow {
   @@index([followeeId])
 }
 
+model Insight {
+  id        Int      @id @default(autoincrement())
+  authorId  Int
+  topic     String   @db.VarChar(100)
+  title     String   @db.VarChar(200)
+  body      String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  User      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([authorId, createdAt])
+}
+
 model Notification {
   id        Int               @id @default(autoincrement())
   userId    Int
@@ -231,6 +244,7 @@ model User {
   Concept                        Concept[]
   Follow_Follow_followeeIdToUser Follow[]             @relation("Follow_followeeIdToUser")
   Follow_Follow_followerIdToUser Follow[]             @relation("Follow_followerIdToUser")
+  Insight                        Insight[]
   Notification                   Notification[]
   Profile                        Profile?
   Question                       Question[]

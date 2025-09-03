@@ -21,6 +21,7 @@ class UpdateTop5Dto {
 }
 
 @Controller('admin')
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('ADMIN')
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}

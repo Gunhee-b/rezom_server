@@ -1,6 +1,6 @@
 // src/hooks/useAuth.ts
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { api } from '@/api/client';
+import { api } from '@/shared/api/client';
 
 type User = { id: number; email: string; displayName?: string };
 type AuthResp = { user?: User; accessToken?: string };

@@ -29,4 +29,38 @@ export class AnswersService {
       orderBy: { createdAt: 'desc' }
     });
   }
+
+  async findOne(id: number) {
+    return this.prisma.answer.findUnique({
+      where: { id },
+      include: {
+        User: {
+          select: { id: true, email: true }
+        }
+      }
+    });
+  }
+
+  async update(id: number, dto: any) {
+    const now = new Date();
+    return this.prisma.answer.update({
+      where: { id },
+      data: {
+        title: dto.title || null,
+        body: dto.body,
+        updatedAt: now
+      },
+      include: {
+        User: {
+          select: { id: true, email: true }
+        }
+      }
+    });
+  }
+
+  async remove(id: number) {
+    return this.prisma.answer.delete({
+      where: { id }
+    });
+  }
 }
