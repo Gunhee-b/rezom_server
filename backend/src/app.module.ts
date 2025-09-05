@@ -14,6 +14,7 @@ import { InsightsModule } from './modules/insights/insights.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AdminModule } from './modules/admin/admin.module';
 import { EventsModule } from './modules/events/events.module';
+import { MailModule } from './modules/mail/mail.module';
 import { PingController } from './ping.controller';
 
 @Module({
@@ -22,6 +23,7 @@ import { PingController } from './ping.controller';
     PrismaModule,
     RedisModule,
     HealthModule,
+    MailModule, // Mail module must be imported before Auth module
     AuthModule, // +
     UsersModule, // +
     CategoriesModule, // +

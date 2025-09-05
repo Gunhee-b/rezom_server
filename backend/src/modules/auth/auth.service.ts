@@ -2,13 +2,16 @@ import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/
 import * as argon2 from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../../infrastructure/prisma/prisma.service';
+import { MailService } from '../mail/mail.service';
 import { JwtPayload, Tokens } from './types';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly jwt: JwtService
+    private readonly jwt: JwtService,
+    private readonly mail: MailService
   ) {}
 
   private async signTokens(userId: number, email: string, tokenVersion: number): Promise<Tokens> {
@@ -111,7 +114,6 @@ export class AuthService {
       return;
     }
 
-    const crypto = require('crypto');
     const resetToken = crypto.randomBytes(32).toString('hex');
     const resetTokenExp = new Date(Date.now() + 3600000);
 
@@ -120,7 +122,8 @@ export class AuthService {
       data: { resetToken, resetTokenExp }
     });
 
-    await this.sendResetEmail(user.email, resetToken);
+    const resetUrl = `${process.env.FRONTEND_URL || 'https://rezom.org'}/reset-password?token=${resetToken}`;
+    await this.mail.sendPasswordResetEmail(user.email, resetUrl);
   }
 
   async resetPassword(token: string, newPassword: string) {
@@ -132,7 +135,7 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new Error('Invalid or expired reset token');
+      throw new BadRequestException('Invalid or expired reset token');
     }
 
     const passwordHash = await argon2.hash(newPassword);
@@ -146,10 +149,5 @@ export class AuthService {
         tokenVersion: user.tokenVersion + 1
       }
     });
-  }
-
-  private async sendResetEmail(email: string, token: string) {
-    const resetUrl = `${process.env.FRONTEND_URL || 'https://rezom.org'}/reset-password?token=${token}`;
-    console.log(`Password reset link for ${email}: ${resetUrl}`);
   }
 }

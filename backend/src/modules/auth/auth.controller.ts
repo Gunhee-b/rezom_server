@@ -141,4 +141,20 @@ export class AuthController {
     const { sub, email, role } = req.user;
     return { id: Number(sub), email, role };
   }
+
+  @Post('forgot-password')
+  @HttpCode(200)
+  @UseGuards(RateLimitGuard)
+  async forgotPassword(@Body() body: { email: string }) {
+    await this.auth.requestPasswordReset(body.email);
+    return { ok: true, message: 'If the email exists, a reset link has been sent' };
+  }
+
+  @Post('reset-password')
+  @HttpCode(200)
+  @UseGuards(RateLimitGuard)
+  async resetPassword(@Body() body: { token: string; newPassword: string }) {
+    await this.auth.resetPassword(body.token, body.newPassword);
+    return { ok: true, message: 'Password has been reset successfully' };
+  }
 }
