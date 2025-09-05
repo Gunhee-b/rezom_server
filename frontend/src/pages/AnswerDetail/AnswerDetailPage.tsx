@@ -438,15 +438,30 @@ export default function AnswerDetailPage() {
 
         {/* Navigation */}
         <div className="flex justify-between items-center">
-          <button
-            onClick={handleBackToQuestion}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            질문으로 돌아가기
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={handleBackToQuestion}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              질문으로 돌아가기
+            </button>
+            
+            {/* Navigate to My Writings */}
+            {isAuthed && (
+              <button
+                onClick={() => navigate('/users/me')}
+                className="flex items-center gap-2 px-4 py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 rounded-lg transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                내 글 보기
+              </button>
+            )}
+          </div>
           
           {/* Answer navigation (if there are multiple answers) */}
           {answers && answers.length > 1 && (

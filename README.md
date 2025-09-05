@@ -39,9 +39,16 @@ Rezom enables users to:
 - **Questions Tab**: All questions you've created
 - **Answers Tab**: All answers you've provided
 - **Insights Tab**: All free insights you've written ⭐ *New*
+- **Analyze World Top-5 Tab**: View the most important questions from analyze-world ⭐ *New*
 - Edit, delete, and manage all your content
 
-### 6. **User Authentication**
+### 6. **Daily Question System** ⭐ *New Feature*
+- **Admin Panel**: Manage today's question through dedicated admin interface
+- **Question Selection**: Choose from all available questions to feature as daily
+- **Dynamic Updates**: Real-time question management with Redis caching
+- **Admin Access**: Protected admin routes for authorized users only
+
+### 7. **User Authentication**
 - Secure sign-up and login system
 - Password reset functionality
 - Protected routes for authenticated content
@@ -90,6 +97,7 @@ npm run dev
 4. **Access the application**
 - Frontend: http://localhost:5173
 - Backend API: http://localhost:3000
+- Admin Panel: http://localhost:3001 (for daily question management)
 - API Documentation: http://localhost:3000/docs
 
 ## 📱 How to Use Rezom
@@ -198,6 +206,10 @@ frontend/
 - `POST /comments` - Create comment
 - `PUT /comments/:id` - Update comment
 - `DELETE /comments/:id` - Delete comment
+
+### Daily Question ⭐ *New*
+- `GET /daily/question` - Get current daily question
+- `PUT /daily/question` - Set daily question (admin only)
 
 ### Insights ⭐ *New*
 - `GET /insights/my` - Get user's insights
@@ -317,6 +329,13 @@ We welcome contributions! Here's how to get started:
 - Include documentation for new features
 
 ## 📊 Recent Updates
+
+### Version 1.4.1 (2025-09-05) ⭐ *Latest*
+- ✨ **New**: Daily Question management system with admin panel
+- ✨ **New**: Analyze World Top-5 questions display in user dashboard
+- 🐛 **Fixed**: Today's question internal server error resolved
+- 🔄 **Enhanced**: Route conflict resolution and improved API reliability
+- 🎯 **Improved**: User dashboard now shows community's most important questions
 
 ### Version 1.4.0 (2025-09-03)
 - ✨ **New**: Free Insights feature for topic-based writing

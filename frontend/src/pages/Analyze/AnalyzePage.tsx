@@ -3,7 +3,7 @@ import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { getKeywords, type TopFiveKeyword, type ConceptKeyword } from '@/api/define'
 import { MindmapCanvas } from '@/widgets/mindmap/MindmapCanvas'
-import { defineSchema } from './define.schema'
+import { defineSchema } from '../Define/define.schema'
 import { QuestionDetailView } from '@/components/QuestionDetailView'
 import { useConceptUpdates } from '@/hooks/useConceptUpdates'
 
@@ -12,14 +12,14 @@ function isTop5Format(data: ConceptKeyword[] | TopFiveKeyword[]): data is TopFiv
   return data.length > 0 && 'rank' in data[0] && 'questionId' in data[0];
 }
 
-export default function DefinePage() {
+export default function AnalyzePage() {
   const { slug } = useParams<{ slug?: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   
-  // Default to language-definition if no slug provided
-  const conceptSlug = slug || 'language-definition';
+  // Default to analyze-world if no slug provided
+  const conceptSlug = slug || 'analyze-world';
   const questionId = searchParams.get('questionId');
   
   const [selectedQuestionId, setSelectedQuestionId] = useState<number | null>(
@@ -51,10 +51,10 @@ export default function DefinePage() {
     // Start with base schema
     const s = JSON.parse(JSON.stringify(defineSchema)) as typeof defineSchema;
 
-    // Update center node to fixed "Definition" text
+    // Update center node to fixed "Analyze" text
     const center = s.nodes.find(n => n.id.endsWith(':title'));
     if (center) {
-      center.label = 'Definition';
+      center.label = 'Analyze';
     }
 
     // Clear existing nodes and edges (except center)
@@ -75,7 +75,7 @@ export default function DefinePage() {
             const y = 48 + radius * Math.sin(angle);
             
             return {
-              id: `def:q${keyword.questionId}`,
+              id: `analyze:q${keyword.questionId}`,
               x: Math.max(5, Math.min(95, x)),
               y: Math.max(10, Math.min(85, y)),
               label: keyword.label,
@@ -98,7 +98,7 @@ export default function DefinePage() {
             const y = 48 + radius * Math.sin(angle);
             
             return {
-              id: `def:${keyword.keyword.toLowerCase()}`,
+              id: `analyze:${keyword.keyword.toLowerCase()}`,
               x: Math.max(5, Math.min(95, x)),
               y: Math.max(10, Math.min(85, y)),
               label: keyword.keyword,
@@ -112,7 +112,7 @@ export default function DefinePage() {
       // Create edges from center to keyword nodes
       if (center) {
         const edges = nodes.map((node, index) => ({
-          id: `def:edge-${index}`,
+          id: `analyze:edge-${index}`,
           from: center.id,
           to: node.id,
           style: (selectedQuestionId && 'questionId' in node && node.questionId === selectedQuestionId) 
@@ -140,7 +140,7 @@ export default function DefinePage() {
       // Update URL without full navigation
       const newSearchParams = new URLSearchParams(searchParams);
       newSearchParams.set('questionId', questionId.toString());
-      navigate(`/define/${conceptSlug}?${newSearchParams.toString()}`, { replace: true });
+      navigate(`/analyze/${conceptSlug}?${newSearchParams.toString()}`, { replace: true });
     }
   };
 
@@ -152,7 +152,7 @@ export default function DefinePage() {
     const newSearchParams = new URLSearchParams(searchParams);
     newSearchParams.delete('questionId');
     const newSearch = newSearchParams.toString();
-    navigate(`/define/${conceptSlug}${newSearch ? `?${newSearch}` : ''}`, { replace: true });
+    navigate(`/analyze/${conceptSlug}${newSearch ? `?${newSearch}` : ''}`, { replace: true });
   };
 
 
@@ -161,7 +161,7 @@ export default function DefinePage() {
       <div className="pt-6">
         <div className="flex items-center justify-center h-96">
           <div className="animate-pulse text-gray-500">
-            개념을 불러오는 중...
+            분석을 불러오는 중...
           </div>
         </div>
       </div>

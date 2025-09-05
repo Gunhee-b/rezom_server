@@ -29,17 +29,27 @@ export function MindNode({ r, label, autoWrap = true, fontPx }: Props) {
 
   return (
     <g>
+      {/* Use oval.svg as background image */}
+      <image
+        href="/oval.svg"
+        x={-r * 1.3}
+        y={-r * 0.9}
+        width={r * 2.6}
+        height={r * 1.8}
+        preserveAspectRatio="xMidYMid meet"
+        opacity={0.5}
+      />
+      {/* Fallback ellipse for structure */}
       <ellipse
         rx={r}
-        ry={r * 0.7}
-        fill={TOKENS.colors.white}
-        stroke={TOKENS.colors.gray}
-        strokeWidth={TOKENS.node.strokeWidth}
+        ry={r * 0.65}
+        fill="transparent"
+        stroke="none"
       />
       {lines.length > 0 && (
         <text
           textAnchor="middle"
-          style={{ fontSize, fontWeight: TOKENS.node.label.weight, fill: TOKENS.colors.ink }}
+          style={{ fontSize, fontWeight: 500, fill: TOKENS.colors.ink }}
         >
           {lines.map((ln, i) => (
             <tspan key={i} x={0} y={startY + i * lh}>

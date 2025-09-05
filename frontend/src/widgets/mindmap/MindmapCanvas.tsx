@@ -32,11 +32,11 @@ export const MindmapCanvas = memo(function MindmapCanvas({ schema, onNodeClick }
 
   return (
     // <div className="relative w-full h-[80vh]">
-    <div className="relative" style={{ width: '100%', height: '80vh' }}>
+    <div className="relative" style={{ width: '100%', height: '80vh', background: 'transparent' }}>
       <svg
         viewBox={`0 0 ${W} ${H}`}
         className="absolute inset-0 w-full h-full"
-        style={{ width: '100%', height: '100%', outline: '1px dashed #ddd' }}
+        style={{ width: '100%', height: '100%', background: 'transparent' }}
         data-canvas-root
         aria-label={schema.background ?? 'mindmap'}
       >

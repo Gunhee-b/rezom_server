@@ -37,13 +37,33 @@ export function Logo(props: SvgProps | DomProps) {
     return (
       // SVG 네임스페이스에서는 <Link> 대신 <a href> 사용
       <a href={to} className={props.className}>
-        <text
-          data-role={roleAttr}
-          textAnchor="middle"
-          style={{ fontSize: size, fontWeight: weight, fill: TOKENS.colors.ink }}
-        >
-          ReZom
-        </text>
+        <g>
+          {/* "In the" text above ReZom */}
+          <text
+            textAnchor="middle"
+            x="0"
+            y={-size * 0.6}
+            style={{ 
+              fontSize: size * 0.3, 
+              fontStyle: 'italic',
+              fontWeight: 400,
+              fill: '#9E9E9E',
+              fontFamily: 'serif'
+            }}
+          >
+            In the
+          </text>
+          {/* ReZom main logo text */}
+          <text
+            data-role={roleAttr}
+            textAnchor="middle"
+            x="0"
+            y={size * 0.3}
+            style={{ fontSize: size, fontWeight: weight, fill: TOKENS.colors.ink }}
+          >
+            ReZom
+          </text>
+        </g>
       </a>
     );
   }
@@ -51,9 +71,21 @@ export function Logo(props: SvgProps | DomProps) {
   // DOM 모드: SPA 네비게이션
   return (
     <Link to={to} className={props.className}>
-      <span style={{ fontSize: size, fontWeight: weight, color: TOKENS.colors.ink }}>
-        ReZom
-      </span>
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ 
+          fontSize: size * 0.4, 
+          fontStyle: 'italic',
+          fontWeight: 400,
+          color: '#9E9E9E',
+          fontFamily: 'serif',
+          marginBottom: '4px'
+        }}>
+          In the
+        </div>
+        <span style={{ fontSize: size, fontWeight: weight, color: TOKENS.colors.ink }}>
+          ReZom
+        </span>
+      </div>
     </Link>
   );
 }

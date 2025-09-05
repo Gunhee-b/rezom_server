@@ -3,6 +3,8 @@ import { LoginPage } from '@/routes/LoginPage';
 import { SimpleDashboard } from '@/routes/SimpleDashboard';
 import { SimpleQuestionsPage } from '@/routes/SimpleQuestionsPage';
 import { SimpleTop5Page } from '@/routes/SimpleTop5Page';
+import { TodaysQuestionPage } from '@/routes/TodaysQuestionPage';
+import { AnalyzeWorldPage } from '@/routes/AnalyzeWorldPage';
 import { RequireAdmin } from '@/routes/RequireAdmin';
 
 export const router = createBrowserRouter([
@@ -11,4 +13,6 @@ export const router = createBrowserRouter([
   { path: '/dashboard', element: <RequireAdmin><SimpleDashboard /></RequireAdmin> },
   { path: '/questions', element: <RequireAdmin><SimpleQuestionsPage /></RequireAdmin> },
   { path: '/top5', element: <RequireAdmin><SimpleTop5Page /></RequireAdmin> },
+  { path: '/todays-question', element: <RequireAdmin><TodaysQuestionPage /></RequireAdmin> },
+  { path: '/analyze-world', element: <RequireAdmin><AnalyzeWorldPage /></RequireAdmin> },
 ]);

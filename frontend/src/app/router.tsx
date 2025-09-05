@@ -25,6 +25,11 @@ const RegisterPage = lazy(() => import('@/pages/Auth/RegisterPage'));
 const ForgotPasswordPage = lazy(() => import('@/pages/ForgotPassword/ForgotPasswordPage'));
 const ResetPasswordPage = lazy(() => import('@/pages/ResetPassword/ResetPasswordPage'));
 const FreeInsightPage = lazy(() => import('@/pages/FreeInsight/FreeInsightPage'));
+const TodaysQuestionPage = lazy(() => import('@/pages/TodaysQuestion/TodaysQuestionPage'));
+const AdminPage = lazy(() => import('@/pages/Admin/AdminPage'));
+const TodaysQuestionAdmin = lazy(() => import('@/pages/Admin/TodaysQuestionAdmin'));
+const AnalyzeWorldAdmin = lazy(() => import('@/pages/Admin/AnalyzeWorldAdmin'));
+const AnalyzePage = lazy(() => import('@/pages/Analyze/AnalyzePage'));
 
 // Loading component for lazy loaded pages
 const PageLoader = () => (
@@ -105,7 +110,22 @@ export const router = createBrowserRouter([
         errorElement: <RouteErrorBoundary />,
       },
       {
+        path: PROTECTED_ROUTES.ANALYZE,
+        element: <LazyPage Component={AnalyzePage} />,
+        errorElement: <RouteErrorBoundary />,
+      },
+      {
+        path: PROTECTED_ROUTES.ANALYZE_TOPIC,
+        element: <LazyPage Component={AnalyzePage} />,
+        errorElement: <RouteErrorBoundary />,
+      },
+      {
         path: PROTECTED_ROUTES.ANSWER_DETAIL,
+        element: <LazyPage Component={AnswerDetailPage} />,
+        errorElement: <RouteErrorBoundary />,
+      },
+      {
+        path: PROTECTED_ROUTES.ANALYZE_ANSWER_DETAIL,
         element: <LazyPage Component={AnswerDetailPage} />,
         errorElement: <RouteErrorBoundary />,
       },
@@ -117,6 +137,38 @@ export const router = createBrowserRouter([
       {
         path: PROTECTED_ROUTES.FREE_INSIGHT,
         element: <LazyPage Component={FreeInsightPage} />,
+        errorElement: <RouteErrorBoundary />,
+      },
+      {
+        path: PROTECTED_ROUTES.TODAYS_QUESTION,
+        element: <LazyPage Component={TodaysQuestionPage} />,
+        errorElement: <RouteErrorBoundary />,
+      },
+      {
+        path: PROTECTED_ROUTES.ADMIN,
+        element: (
+          <RequireAuth requiredRole="ADMIN">
+            <LazyPage Component={AdminPage} />
+          </RequireAuth>
+        ),
+        errorElement: <RouteErrorBoundary />,
+      },
+      {
+        path: PROTECTED_ROUTES.ADMIN_TODAYS_QUESTION,
+        element: (
+          <RequireAuth requiredRole="ADMIN">
+            <LazyPage Component={TodaysQuestionAdmin} />
+          </RequireAuth>
+        ),
+        errorElement: <RouteErrorBoundary />,
+      },
+      {
+        path: PROTECTED_ROUTES.ADMIN_ANALYZE_WORLD,
+        element: (
+          <RequireAuth requiredRole="ADMIN">
+            <LazyPage Component={AnalyzeWorldAdmin} />
+          </RequireAuth>
+        ),
         errorElement: <RouteErrorBoundary />,
       },
       {

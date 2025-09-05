@@ -3,7 +3,7 @@
 export type EdgeKind = 'green' | 'brown' | 'thin' | 'default';
 
 export const TOKENS = {
-  colors: { ink:'#111', gray:'#9E9E9E', white:'#fff', green:'#1B5E20', brown:'#5D4037' },
+  colors: { ink:'#1F2937', gray:'#9CA3AF', white:'#fff', green:'#15803D', brown:'#5D4037' },
   viewBox: { w: 1000, h: 700 },
 
   node: {
@@ -20,10 +20,10 @@ export const TOKENS = {
 
   edge: {
     map: {
-      green:  { stroke: '#1B5E20', width: 8 },
-      brown:  { stroke: '#5D4037', width: 8 },
-      thin:   { stroke: '#9E9E9E', width: 2 },
-      default:{ stroke: '#9E9E9E', width: 2 },
+      green:  { stroke: '#15803D', width: 6 },
+      brown:  { stroke: '#5D4037', width: 6 },
+      thin:   { stroke: '#D1D5DB', width: 1.5 },
+      default:{ stroke: '#D1D5DB', width: 1.5 },
     },
   },
 

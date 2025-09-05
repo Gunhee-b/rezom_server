@@ -17,13 +17,14 @@ function centerOf(el: Element | null): Pt | null {
 }
 
 export default function HomePage() {
-  const { isAuthed, logout } = useAuth();
+  const { isAuthed, logout, isInitialized } = useAuth();
   const [openLogin, setOpenLogin] = useState(() => {
     // Auto-open login if redirected from auth error
     return !!sessionStorage.getItem('redirectAfterLogin');
   });
   const [logoFontPx, setLogoFontPx] = useState<number>(TOKENS.typography.logo.size);
-  const authed = isAuthed;
+  const [showDevMessage, setShowDevMessage] = useState(true);
+  const authed = isInitialized ? isAuthed : false; // Only consider authed when initialized
 
   // overlay vine
   const [vineD, setVineD] = useState<string | null>(null);
@@ -72,6 +73,18 @@ export default function HomePage() {
   }, []);
 
   // Storage sync is now handled by useAuth hook
+
+  // Handle Escape key to close dev message
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowDevMessage(false);
+      }
+    };
+    
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, []);
 
   // 섹션 보이면(미로그인일 때) ReZom→Login 경로 계산 & 드로우
   useEffect(() => {
@@ -167,7 +180,15 @@ export default function HomePage() {
   };
 
   return (
-    <main className="min-h-screen bg-neutral-50">
+    <main 
+      className="min-h-screen bg-gradient-to-br from-gray-50 to-white"
+      style={{
+        backgroundImage: 'url(/wallpaper.svg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
       {/* 상단 허브 */}
       <div className="pt-6">
         <MindmapCanvas schema={derivedSchema} />
@@ -208,8 +229,40 @@ export default function HomePage() {
           onLogout={handleLogout}
           buttonFontPx={logoFontPx * 0.6}
           panelScale={1}
+          isInitialized={isInitialized}
         />
       </section>
+
+      {/* Development Status Message */}
+      {showDevMessage && (
+        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50">
+          <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-2 shadow-md max-w-2xl">
+            <div className="flex justify-between items-start">
+              <p className="text-amber-800 text-sm font-medium whitespace-pre-line pr-4">
+                현재 로그인 상태의 일부 오류로 로그인하시고 새로고침 해주셔야 정상 이용이 가능합니다.
+                사용을 완료하시고 로그아웃 해주셔야 이후 과정에서도 문제가 발생하지 않습니다.
+                빠른 시일 내에 해결하도록 노력하겠습니다.
+                
+                또, 현재 'Description by Metaphor' 기능, 'Analyzing the World' 기능, 'Recommended Questions' 기능은 개발 중입니다
+                빠른 시일 내에 선보일 수 있도록 노력하겠습니다.
+
+                베타 테스트에 참여해주시는 여러분들 진심으로 감사합니다.
+                -리좀 개발자 올림
+              </p>
+              <button
+                onClick={() => setShowDevMessage(false)}
+                className="text-amber-600 hover:text-amber-800 font-bold text-lg leading-none ml-2"
+                aria-label="Close message"
+              >
+                ×
+              </button>
+            </div>
+            <p className="text-amber-600 text-xs mt-2 text-center">
+              Press ESC to close this message
+            </p>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

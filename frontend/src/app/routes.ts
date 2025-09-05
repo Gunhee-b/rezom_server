@@ -13,17 +13,22 @@ export const PROTECTED_ROUTES = {
   WRITING_HUB: '/writinghub',
   DEFINE: '/define',
   DEFINE_TOPIC: '/define/:slug',
+  ANALYZE: '/analyze',
+  ANALYZE_TOPIC: '/analyze/:slug',
   ANSWER_DETAIL: '/define/:slug/questions/:questionId/answers/:answerId',
+  ANALYZE_ANSWER_DETAIL: '/analyze/:slug/questions/:questionId/answers/:answerId',
   WRITE: '/write',
   FREE_INSIGHT: '/free-insight',
+  TODAYS_QUESTION: '/todays-question',
+  ADMIN: '/admin',
+  ADMIN_TODAYS_QUESTION: '/admin/todays-question',
+  ADMIN_ANALYZE_WORLD: '/admin/analyze-world',
   USER_HOME: '/users/me',
   USER_QUESTIONS: '/users/me/questions',
 } as const;
 
 export const COMING_SOON_ROUTES = {
   METAPHOR: '/metaphor',
-  ANALYZE: '/analyze',
-  TODAYS_QUESTION: '/todays-question',
   RECOMMENDED: '/recommended',
 } as const;
 
@@ -38,7 +43,5 @@ export const DEPRECATED_ROUTES = {
 
 export const COMING_SOON_MESSAGES = {
   [COMING_SOON_ROUTES.METAPHOR]: '9월 중 공개 예정입니다',
-  [COMING_SOON_ROUTES.ANALYZE]: '9월 중 공개 예정입니다',
-  [COMING_SOON_ROUTES.TODAYS_QUESTION]: '9월 중 공개 예정입니다',
   [COMING_SOON_ROUTES.RECOMMENDED]: '추후 업데이트될 예정입니다',
 } as const;

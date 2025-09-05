@@ -250,8 +250,8 @@ export function SimpleTop5Page() {
                     >
                       <div className="flex-1">
                         <div className="flex items-center space-x-2">
-                          <span className="bg-blue-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
-                            {index + 1}
+                          <span className="bg-blue-500 text-white text-xs px-2 py-1 font-bold">
+                            #{index + 1}
                           </span>
                           <div>
                             <h3 className="font-medium text-sm">ID: {question.id} - {question.title}</h3>

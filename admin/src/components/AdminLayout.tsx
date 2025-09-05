@@ -21,6 +21,8 @@ export function AdminLayout({ children, title = 'Admin Dashboard' }: AdminLayout
     { name: 'Dashboard', href: '/dashboard', current: location.pathname === '/dashboard' },
     { name: 'Questions', href: '/questions', current: location.pathname === '/questions' },
     { name: 'Top-5', href: '/top5', current: location.pathname === '/top5' },
+    { name: "Today's Question", href: '/todays-question', current: location.pathname === '/todays-question' },
+    { name: 'Analyze World', href: '/analyze-world', current: location.pathname === '/analyze-world' },
   ];
 
   return (
@@ -31,9 +33,6 @@ export function AdminLayout({ children, title = 'Admin Dashboard' }: AdminLayout
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-8">
               <Link to="/dashboard" className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                  R
-                </div>
                 <h1 className="text-xl font-semibold text-gray-900">Rezom Admin</h1>
               </Link>
               
@@ -58,11 +57,6 @@ export function AdminLayout({ children, title = 'Admin Dashboard' }: AdminLayout
             {/* User menu */}
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
-                <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center">
-                  <svg className="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                  </svg>
-                </div>
                 <span className="text-sm text-gray-700 font-medium">{user?.email}</span>
               </div>
               <button 
