@@ -20,6 +20,12 @@ class UpdateTop5Dto {
   questionIds!: number[];
 }
 
+class SetDailyQuestionDto {
+  @IsInt()
+  @IsNotEmpty()
+  questionId!: number;
+}
+
 @Controller('admin')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('ADMIN')
@@ -37,6 +43,13 @@ export class AdminController {
   @HttpCode(200)
   async updateTop5(@Param('slug') slug: string, @Body() dto: UpdateTop5Dto) {
     const result = await this.adminService.updateTop5Questions(slug, dto.questionIds);
+    return result;
+  }
+
+  @Post('daily-question')
+  @HttpCode(200)
+  async setDailyQuestion(@Body() dto: SetDailyQuestionDto) {
+    const result = await this.adminService.setDailyQuestion(dto.questionId);
     return result;
   }
 }

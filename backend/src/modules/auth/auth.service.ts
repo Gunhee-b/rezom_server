@@ -44,20 +44,37 @@ export class AuthService {
   }
 
   async login(email: string, password: string) {
+    console.log('[AUTH] Login attempt for:', email);
+    console.log('[AUTH] Database query: prisma.user.findUnique({ where: { email: "' + email + '" } })');
     const user = await this.prisma.user.findUnique({ where: { email } });
-    if (!user) throw new UnauthorizedException('Invalid credentials');
+    if (!user) {
+      console.log('[AUTH] User not found:', email);
+      throw new UnauthorizedException('Invalid credentials');
+    }
+    
+    console.log('[AUTH] Found user raw data:', JSON.stringify(user, null, 2));
+    console.log('[AUTH] Found user:', { id: user.id, email: user.email, role: user.role });
 
     const ok = await argon2.verify(user.passwordHash, password);
-    if (!ok) throw new UnauthorizedException('Invalid credentials');
+    if (!ok) {
+      console.log('[AUTH] Password verification failed for:', email);
+      throw new UnauthorizedException('Invalid credentials');
+    }
+    
+    console.log('[AUTH] Password verified for user ID:', user.id);
 
     const tokens = await this.signTokens(user.id, user.email, user.tokenVersion);
+    console.log('[AUTH] Generated tokens for user ID:', user.id);
+    
     const refreshHash = await argon2.hash(tokens.refreshToken);
     await this.prisma.user.update({
       where: { id: user.id },
       data: { refreshTokenHash: refreshHash },
     });
 
-    return { user: { id: user.id, email: user.email, displayName: user.displayName, role: user.role }, ...tokens };
+    const result = { user: { id: user.id, email: user.email, displayName: user.displayName, role: user.role }, ...tokens };
+    console.log('[AUTH] Login successful for user ID:', user.id);
+    return result;
   }
 
   async logout(userId: number) {

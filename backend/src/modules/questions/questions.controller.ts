@@ -35,11 +35,6 @@ export class QuestionsController {
     return this.svc.findAll(catId);
   }
 
-  @Get('daily')
-  async getDaily() {
-    return this.svc.getDailyQuestion();
-  }
-
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.svc.findOne(Number(id));

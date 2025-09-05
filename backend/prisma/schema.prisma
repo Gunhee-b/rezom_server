@@ -11,10 +11,10 @@ model Answer {
   id         Int       @id @default(autoincrement())
   questionId Int
   authorId   Int
-  title      String?   @db.VarChar(200)
   body       String?   @db.VarChar(1500)
   createdAt  DateTime  @default(now())
   updatedAt  DateTime
+  title      String?   @db.VarChar(200)
   User       User      @relation(fields: [authorId], references: [id])
   Question   Question  @relation(fields: [questionId], references: [id], onDelete: Cascade)
   Comment    Comment[]
@@ -239,6 +239,8 @@ model User {
   updatedAt                      DateTime
   refreshTokenHash               String?
   tokenVersion                   Int                  @default(0)
+  resetToken                     String?              @unique
+  resetTokenExp                  DateTime?
   Answer                         Answer[]
   Comment                        Comment[]
   Concept                        Concept[]
@@ -249,8 +251,6 @@ model User {
   Profile                        Profile?
   Question                       Question[]
   QuestionSuggestion             QuestionSuggestion[]
-  resetToken     String?   @unique
-  resetTokenExp  DateTime?
 }
 
 enum Notification_type {
