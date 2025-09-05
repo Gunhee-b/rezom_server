@@ -1,0 +1,24 @@
+name: "🗂 Epic"
+description: 여러 이슈를 묶는 상위 이니셔티브
+title: "epic: <이니셔티브>"
+labels: ["epic", "planning"]
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: 목표/가치
+  - type: textarea
+    id: scope
+    attributes:
+      label: 범위/제외
+  - type: textarea
+    id: breakdown
+    attributes:
+      label: 하위 이슈 체크리스트
+      placeholder: |
+        - [ ] #123 feat: ...
+        - [ ] #124 chore: ...
+  - type: textarea
+    id: metrics
+    attributes:
+      label: 성공 지표

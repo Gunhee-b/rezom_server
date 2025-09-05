@@ -1,0 +1,22 @@
+name: "🛠 Tech Task"
+description: 리팩토링/성능/인프라 작업
+title: "chore: <작업 한 줄 요약>"
+labels: ["tech", "backend", "p2"]
+body:
+  - type: textarea
+    id: task
+    attributes:
+      label: 작업 내용
+  - type: checkboxes
+    id: types
+    attributes:
+      label: 작업 유형
+      options:
+        - label: 리팩토링
+        - label: 성능/캐싱
+        - label: 보안/권한
+        - label: 인프라/배포
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: 수용 기준(DoD)
