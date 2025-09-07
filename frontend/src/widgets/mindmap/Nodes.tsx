@@ -37,7 +37,7 @@ export const Nodes = memo(function Nodes({ nodes, map, onNodeClick }: Props) {
               ))}
             </text>
           ) : (
-            <MindNode r={TOKENS.node.radius[n.size ?? 'md']} label={n.label} />
+            <MindNode r={TOKENS.node.radius[n.size ?? 'md']} label={n.label} disabled={n.disabled} />
           );
 
         const inner = (

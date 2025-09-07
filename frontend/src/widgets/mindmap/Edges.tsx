@@ -3,6 +3,7 @@ import React, { memo } from 'react';
 import type { Edge } from './types';
 import { quadPath, Pt } from '@/shared/lib/geo';
 import { TOKENS } from '@/shared/theme/tokens';
+import { VineEdge } from './VineEdge';
 
 type Props = {
   edges: Edge[];
@@ -22,6 +23,8 @@ export const Edges = memo(function Edges({ edges, getOpt, hasId, defaultK = TOKE
         }
         const a = getOpt(e.from)!;
         const b = getOpt(e.to)!;
+        
+        // Use regular path for all styles
         const d = quadPath(a, b, e.curvature ?? defaultK);
         const style = TOKENS.edge.map[e.style ?? 'default'];
 

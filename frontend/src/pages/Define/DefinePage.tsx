@@ -155,6 +155,7 @@ export default function DefinePage() {
     navigate(`/define/${conceptSlug}${newSearch ? `?${newSearch}` : ''}`, { replace: true });
   };
 
+
   if (isLoading) {
     return (
       <div className="pt-6">
@@ -168,32 +169,56 @@ export default function DefinePage() {
   }
 
   return (
-    <div className="pt-6">
-      {/* Mindmap Canvas */}
-      <MindmapCanvas 
-        key={`${conceptSlug}-${keywordsData?.length || 0}-${selectedQuestionId || 'none'}`} 
-        schema={schema}
-        onNodeClick={handleNodeClick}
-      />
-      
-      {/* Question Detail Modal */}
-      {selectedQuestionId && (
-        <QuestionDetailView
-          slug={conceptSlug}
-          questionId={selectedQuestionId}
-          onClose={handleQuestionDetailClose}
-        />
-      )}
-      
-      {/* Debug info (remove in production) */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="fixed bottom-4 right-4 bg-black bg-opacity-75 text-white p-2 rounded text-xs">
-          <div>Slug: {conceptSlug}</div>
-          <div>Keywords: {keywordsData?.length || 0}</div>
-          <div>Format: {keywordsData && isTop5Format(keywordsData) ? 'Top-5' : 'Fallback'}</div>
-          <div>Selected: {selectedQuestionId || 'None'}</div>
+    <div className="min-h-screen pt-6">
+        {/* Back to Homepage Button */}
+        <div className="absolute top-6 left-6 z-10">
+          <button
+            onClick={() => navigate('/')}
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 transition-colors"
+            aria-label="Back to homepage"
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
+            </svg>
+            <span className="text-sm font-medium text-gray-700">홈으로</span>
+          </button>
         </div>
-      )}
+
+        {/* Mindmap Canvas */}
+        <MindmapCanvas 
+          key={`${conceptSlug}-${keywordsData?.length || 0}-${selectedQuestionId || 'none'}`} 
+          schema={schema}
+          onNodeClick={handleNodeClick}
+        />
+      
+        {/* Question Detail Modal */}
+        {selectedQuestionId && (
+          <QuestionDetailView
+            slug={conceptSlug}
+            questionId={selectedQuestionId}
+            onClose={handleQuestionDetailClose}
+          />
+        )}
+        
+        {/* Debug info (remove in production) */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="fixed bottom-4 right-4 bg-black bg-opacity-75 text-white p-2 rounded text-xs">
+            <div>Slug: {conceptSlug}</div>
+            <div>Keywords: {keywordsData?.length || 0}</div>
+            <div>Format: {keywordsData && isTop5Format(keywordsData) ? 'Top-5' : 'Fallback'}</div>
+            <div>Selected: {selectedQuestionId || 'None'}</div>
+          </div>
+        )}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 // src/api/define.ts
-import { api } from './client';
+import { api } from '@/shared/api/client';
 
 export type Concept = {
   id: number;
@@ -128,9 +128,25 @@ export type TopFiveKeyword = {
 };
 
 export async function getKeywords(slug: string): Promise<ConceptKeyword[] | TopFiveKeyword[]> {
-  return api<ConceptKeyword[] | TopFiveKeyword[]>(`/define/concepts/${slug}/keywords`, {
-    withCredentials: true,
-  });
+  try {
+    // First try to get Top-5 questions from the new endpoint
+    const top5Data = await api<TopFiveQuestion[]>(`/define/${slug}/top5`, {
+      withCredentials: true,
+    });
+    
+    // Transform to TopFiveKeyword format for consistency
+    return top5Data.map(item => ({
+      label: item.title,
+      questionId: item.questionId,
+      rank: item.rank,
+    }));
+  } catch (error) {
+    // Fallback to the original keywords endpoint
+    console.log(`No top5 data for ${slug}, falling back to keywords`);
+    return api<ConceptKeyword[]>(`/define/concepts/${slug}/keywords`, {
+      withCredentials: true,
+    });
+  }
 }
 
 // Get Top-5 questions for a concept
@@ -159,6 +175,7 @@ export type QuestionDetail = {
   createdAt: string;
   isDaily: boolean;
   keywordLabel: string | null;
+  authorId?: number; // Add authorId for ownership checking
 };
 
 export async function getQuestionDetail(slug: string, questionId: number) {
@@ -206,6 +223,111 @@ export async function createAnswer(
   return api<Answer>('/answers', {
     method: 'POST',
     json: data,
+    withCsrf: true,
+    withCredentials: true,
+    ...(accessToken && { accessToken }),
+  });
+}
+
+// Update an answer
+export async function updateAnswer(
+  id: number,
+  data: { title?: string; body: string },
+  accessToken?: string
+): Promise<Answer> {
+  return api<Answer>(`/answers/${id}`, {
+    method: 'PUT',
+    json: data,
+    withCsrf: true,
+    withCredentials: true,
+    ...(accessToken && { accessToken }),
+  });
+}
+
+// Delete an answer
+export async function deleteAnswer(
+  id: number,
+  accessToken?: string
+): Promise<Answer> {
+  return api<Answer>(`/answers/${id}`, {
+    method: 'DELETE',
+    withCsrf: true,
+    withCredentials: true,
+    ...(accessToken && { accessToken }),
+  });
+}
+
+// Comment types
+export type Comment = {
+  id: number;
+  authorId: number;
+  questionId?: number | null;
+  answerId?: number | null;
+  body: string;
+  createdAt: string;
+  User: {
+    id: number;
+    email: string;
+    displayName: string;
+  };
+};
+
+export type CreateCommentRequest = {
+  questionId?: number;
+  answerId?: number;
+  body: string;
+};
+
+// Get comments for an answer
+export async function getAnswerComments(answerId: number): Promise<Comment[]> {
+  return api<Comment[]>(`/comments/answer/${answerId}`, {
+    withCredentials: true,
+  });
+}
+
+// Get comments for a question
+export async function getQuestionComments(questionId: number): Promise<Comment[]> {
+  return api<Comment[]>(`/comments/question/${questionId}`, {
+    withCredentials: true,
+  });
+}
+
+// Create a comment
+export async function createComment(
+  data: CreateCommentRequest,
+  accessToken?: string
+): Promise<Comment> {
+  return api<Comment>('/comments', {
+    method: 'POST',
+    json: data,
+    withCsrf: true,
+    withCredentials: true,
+    ...(accessToken && { accessToken }),
+  });
+}
+
+// Update a comment
+export async function updateComment(
+  id: number,
+  data: { body: string },
+  accessToken?: string
+): Promise<Comment> {
+  return api<Comment>(`/comments/${id}`, {
+    method: 'PUT',
+    json: data,
+    withCsrf: true,
+    withCredentials: true,
+    ...(accessToken && { accessToken }),
+  });
+}
+
+// Delete a comment
+export async function deleteComment(
+  id: number,
+  accessToken?: string
+): Promise<void> {
+  return api<void>(`/comments/${id}`, {
+    method: 'DELETE',
     withCsrf: true,
     withCredentials: true,
     ...(accessToken && { accessToken }),

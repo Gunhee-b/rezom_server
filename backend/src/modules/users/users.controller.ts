@@ -23,4 +23,11 @@ export class UsersController {
     const userId = Number(req.user?.sub);
     return this.usersService.getMyAnswers(userId);
   }
+
+  @Get('me/insights')
+  @UseGuards(JwtAuthGuard)
+  getMyInsights(@Req() req: AuthedRequest) {
+    const userId = Number(req.user?.sub);
+    return this.usersService.getUserInsights(userId);
+  }
 }

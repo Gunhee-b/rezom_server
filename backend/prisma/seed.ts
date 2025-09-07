@@ -1,5 +1,5 @@
 // prisma/seed.ts
-import { PrismaClient, UserRole } from '@prisma/client';
+import { PrismaClient, User_role } from '@prisma/client';
 import * as argon2 from 'argon2';
 
 const prisma = new PrismaClient();
@@ -29,7 +29,8 @@ async function main() {
       email: 'demo@rezom.org',
       passwordHash,
       displayName: 'Rezom Demo',
-      role: UserRole.USER,
+      role: User_role.USER,
+      updatedAt: new Date(),
       // Profile 모델이 존재할 때만 사용하세요.
       // profile: { create: { bio: 'Hello Rezom', links: [{ url: 'https://rezom.org' }] as any } },
     },
@@ -39,16 +40,21 @@ async function main() {
   const adminPw = await argon2.hash(process.env.SEED_ADMIN_PASSWORD ?? 'Admin!2345');
   await prisma.user.upsert({
     where: { email: 'admin@rezom.org' },
-    update: { displayName: 'Rezom Admin', role: UserRole.ADMIN, passwordHash: adminPw },
-    create: { email: 'admin@rezom.org', passwordHash: adminPw, displayName: 'Rezom Admin', role: UserRole.ADMIN },
+    update: { displayName: 'Rezom Admin', role: User_role.ADMIN, passwordHash: adminPw, updatedAt: new Date() },
+    create: { email: 'admin@rezom.org', passwordHash: adminPw, displayName: 'Rezom Admin', role: User_role.ADMIN, updatedAt: new Date() },
   });
 
-  // 3) Create Concepts for /define functionality
+  // 3) Create Concepts for /define and /analyze functionality
   const concepts = [
     {
       slug: 'language-definition',
       title: 'Language Definition',
       description: 'Exploring the nature and structure of language and meaning'
+    },
+    {
+      slug: 'analyze-world',
+      title: 'Analyze World',
+      description: 'Analyzing and understanding global systems and structures'
     },
     {
       slug: 'happiness',
@@ -69,6 +75,7 @@ async function main() {
       create: {
         ...conceptData,
         createdById: demo.id,
+        updatedAt: new Date(),
       },
     });
   }
@@ -99,6 +106,39 @@ async function main() {
         create: {
           conceptId: languageConcept.id,
           ...kw,
+          updatedAt: new Date(),
+        },
+      });
+    }
+  }
+
+  // 4-1) Create default keywords for analyze-world concept
+  const analyzeConcept = await prisma.concept.findUnique({
+    where: { slug: 'analyze-world' }
+  });
+
+  if (analyzeConcept) {
+    const analyzeKeywords = [
+      { keyword: 'Systems', position: 1, active: true },
+      { keyword: 'Economy', position: 2, active: true },
+      { keyword: 'Politics', position: 3, active: true },
+      { keyword: 'Society', position: 4, active: true },
+      { keyword: 'Technology', position: 5, active: true },
+    ];
+
+    for (const kw of analyzeKeywords) {
+      await prisma.conceptKeyword.upsert({
+        where: {
+          conceptId_position: {
+            conceptId: analyzeConcept.id,
+            position: kw.position,
+          }
+        },
+        update: {},
+        create: {
+          conceptId: analyzeConcept.id,
+          ...kw,
+          updatedAt: new Date(),
         },
       });
     }
@@ -115,6 +155,7 @@ async function main() {
         body: '신념의 뿌리를 찾고 연결해보세요.',
         isDaily: true,
         tags: ['daily', 'belief'] as any, // Json 필드
+        updatedAt: new Date(),
       },
     });
   }

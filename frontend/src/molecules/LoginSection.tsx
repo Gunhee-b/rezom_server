@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { login } from '@/shared/api/auth'
+import { useAuth } from '@/hooks/useAuth'
 import { Link } from 'react-router-dom'
 
 type Props = {
@@ -10,12 +10,14 @@ type Props = {
   panelScale?: number
   authed?: boolean
   onLogout?: () => void | Promise<void>
+  isInitialized?: boolean
 }
 
 const LoginSection = React.forwardRef<HTMLButtonElement, Props>(function LoginSection(
-  { authed = false, open, onToggle, onSuccess, onLogout, buttonFontPx = 20, panelScale = 1 }: Props,
+  { authed = false, open, onToggle, onSuccess, onLogout, buttonFontPx = 20, panelScale = 1, isInitialized = true }: Props,
   ref
 ) {
+  const { login, logout: authLogout } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -27,7 +29,7 @@ const LoginSection = React.forwardRef<HTMLButtonElement, Props>(function LoginSe
     setLoading(true)
     setError(null)
     try {
-      await login({ email, password })
+      await login(email, password)
       onSuccess()
     } catch {
       setError('로그인에 실패했습니다.')
@@ -37,10 +39,14 @@ const LoginSection = React.forwardRef<HTMLButtonElement, Props>(function LoginSe
   }
 
   const handleClickLogout = async () => {
-    if (!onLogout || logoutLoading) return
+    if (logoutLoading) return
     setLogoutLoading(true)
     try {
-      await onLogout()
+      if (onLogout) {
+        await onLogout()
+      } else {
+        await authLogout()
+      }
     } finally {
       setLogoutLoading(false)
     }
@@ -48,7 +54,16 @@ const LoginSection = React.forwardRef<HTMLButtonElement, Props>(function LoginSe
 
   return (
     <div className="mx-auto my-12 flex flex-col items-center">
-      {authed ? (
+      {!isInitialized ? (
+        <button
+          ref={ref}
+          disabled
+          className="rounded-2xl bg-gray-400 px-6 py-3 text-white shadow-md"
+          style={{ fontSize: buttonFontPx }}
+        >
+          로딩 중...
+        </button>
+      ) : authed ? (
         <button
           ref={ref}
           aria-label="logout-button"
@@ -64,7 +79,7 @@ const LoginSection = React.forwardRef<HTMLButtonElement, Props>(function LoginSe
           ref={ref}
           aria-label="login-button"
           onClick={onToggle}
-          className="rounded-2xl bg-emerald-600 px-6 py-3 text-white shadow-md hover:bg-emerald-700 transition"
+          className="rounded-2xl bg-emerald-500 px-6 py-3 text-white shadow-md hover:bg-emerald-600 transition"
           style={{ fontSize: buttonFontPx }}
         >
           로그인
@@ -84,7 +99,7 @@ const LoginSection = React.forwardRef<HTMLButtonElement, Props>(function LoginSe
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-400"
               placeholder="you@example.com"
             />
           </div>
@@ -96,7 +111,7 @@ const LoginSection = React.forwardRef<HTMLButtonElement, Props>(function LoginSe
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-md border border-neutral-300 px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-400"
               placeholder="••••••••"
             />
           </div>
@@ -105,7 +120,7 @@ const LoginSection = React.forwardRef<HTMLButtonElement, Props>(function LoginSe
             <button
               type="submit"
               disabled={loading}
-              className="rounded-lg bg-emerald-600 px-4 py-2 text-white disabled:opacity-60"
+              className="rounded-lg bg-emerald-500 px-4 py-2 text-white disabled:opacity-60 hover:bg-emerald-600 transition"
               aria-label="confirm-login"
             >
               {loading ? '로그인 중…' : '로그인'}
@@ -123,10 +138,10 @@ const LoginSection = React.forwardRef<HTMLButtonElement, Props>(function LoginSe
           <div className="mt-4 text-sm space-y-2">
             <div>
               <span className="text-neutral-600">처음이신가요? </span>
-              <Link to="/sign-up" className="text-emerald-700 hover:underline">회원가입</Link>
+              <Link to="/sign-up" className="text-emerald-600 hover:underline">회원가입</Link>
             </div>
             <div>
-              <Link to="/forgot-password" className="text-emerald-700 hover:underline">비밀번호를 잊으셨나요?</Link>
+              <Link to="/forgot-password" className="text-emerald-600 hover:underline">비밀번호를 잊으셨나요?</Link>
             </div>
           </div>
 

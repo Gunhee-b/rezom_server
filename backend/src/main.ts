@@ -10,7 +10,7 @@ import cookieParser from 'cookie-parser';
 import { INestApplication, Logger } from '@nestjs/common';
 import { ModulesContainer } from '@nestjs/core';
 
-const raw = process.env.FRONTEND_ORIGIN || '';
+const raw = process.env.CORS_ORIGIN || process.env.FRONTEND_ORIGIN || '';
 const ALLOWLIST = raw
   .split(',')
   .map(s => s.trim().replace(/\/$/, ''))
@@ -72,7 +72,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
 
   app.enableCors({
-    origin: ALLOWLIST.length ? ALLOWLIST : [/\.rezom\.org$/],
+    origin: ALLOWLIST.length ? ALLOWLIST : ['http://localhost:5173', 'http://localhost:5174'],
     credentials: true,
   });
 

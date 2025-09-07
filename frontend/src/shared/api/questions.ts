@@ -33,11 +33,43 @@ export async function listMyQuestions(): Promise<Question[]> {
   return data
 }
 
+export async function listMyAnswers(): Promise<any[]> {
+  const { data } = await api.get('/users/me/answers')
+  return data
+}
+
+export async function listMySocialAnalysisAnswers(): Promise<any[]> {
+  const { data } = await api.get('/users/me/answers')
+  // Filter answers that are related to analyze world questions (categoryId: 4)
+  return data.filter((answer: any) => 
+    answer.Question?.categoryId === 4
+  )
+}
+
+export async function updateQuestion(id: number, dto: Partial<QuestionCreateDto>): Promise<Question> {
+  const { data } = await api.put(`/questions/${id}`, dto)
+  return data
+}
+
+export async function deleteQuestion(id: number): Promise<Question> {
+  const { data } = await api.delete(`/questions/${id}`)
+  return data
+}
+
+export async function listMyQuestionsForConcept(conceptSlug: string): Promise<Question[]> {
+  const { data: allMyQuestions } = await api.get('/users/me/questions')
+  const { data: conceptQuestions } = await api.get(`/define/concepts/${conceptSlug}/questions?limit=100`)
+  
+  // Filter user's questions that belong to this concept
+  const myQuestionIds = new Set(allMyQuestions.map((q: Question) => q.id))
+  return conceptQuestions.filter((q: Question) => myQuestionIds.has(q.id))
+}
+
 /** ===== 오늘의 질문 ===== */
 export type DailyQuestionResponse = { question: unknown }  // ← 어떤 형태든 허용
 
 export async function getDailyQuestion(): Promise<DailyQuestionResponse> {
-  const { data } = await api.get('/questions/daily')
+  const { data } = await api.get('/daily/question')
   return data
 }
 

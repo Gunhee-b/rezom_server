@@ -123,6 +123,38 @@ export class AdminService {
     }
   }
 
+  async setDailyQuestion(questionId: number): Promise<{ ok: boolean; error?: string }> {
+    try {
+      // Verify the question exists
+      const question = await this.prisma.question.findUnique({
+        where: { id: questionId },
+        select: { id: true, title: true }
+      });
+
+      if (!question) {
+        return { ok: false, error: 'Question not found' };
+      }
+
+      // Store in Redis
+      try {
+        const r = this.redis?.client;
+        if (r?.set) {
+          try {
+            await r.set('daily:question:id', questionId.toString(), "EX", 60 * 60 * 24 * 30);
+          } catch {
+            await r.set('daily:question:id', questionId.toString(), 'EX', 60 * 60 * 24 * 30);
+          }
+        }
+      } catch {
+        // Redis error is non-fatal, we can still store in memory
+      }
+
+      return { ok: true };
+    } catch (error) {
+      return { ok: false, error: 'Failed to set daily question' };
+    }
+  }
+
   private async purgeConceptCache(conceptSlug: string, conceptId: number) {
     try {
       const r = this.redis?.client;

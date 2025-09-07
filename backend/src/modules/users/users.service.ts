@@ -29,4 +29,19 @@ export class UsersService {
       },
     });
   }
+
+  async getUserInsights(userId: number) {
+    return this.prisma.insight.findMany({
+      where: { authorId: userId },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        topic: true,
+        title: true,
+        body: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  }
 }

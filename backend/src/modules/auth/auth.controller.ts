@@ -10,41 +10,44 @@ import { CsrfGuard } from '../../common/guards/csrf.guard';
 
 const RT_COOKIE = process.env.REFRESH_COOKIE_NAME ?? 'rezom_rt';
 const CSRF_NAME = process.env.CSRF_HEADER ?? 'X-CSRF-Token';
-const COOKIE_DOMAIN = process.env.COOKIE_DOMAIN ?? '.rezom.org'; // admin/api 공유
-const COOKIE_SECURE = true; // 프로덕션: https 전제
+const COOKIE_DOMAIN = process.env.COOKIE_DOMAIN || (process.env.NODE_ENV === 'production' ? '.rezom.org' : undefined); // Local doesn't need domain
+const COOKIE_SECURE = process.env.NODE_ENV === 'production'; // Only secure in production
 const COOKIE_SAMESITE = 'lax' as const;
 
 function refreshCookieOpts() {
-  return {
+  const opts: any = {
     httpOnly: true,
     secure: COOKIE_SECURE,
     sameSite: COOKIE_SAMESITE,
-    domain: COOKIE_DOMAIN,
     path: '/auth',
     maxAge: 7 * 24 * 3600 * 1000,
-  } as const;
+  };
+  if (COOKIE_DOMAIN) opts.domain = COOKIE_DOMAIN;
+  return opts;
 }
 
 function csrfCookieOpts() {
-  return {
+  const opts: any = {
     httpOnly: false,           // 프론트에서 document.cookie로 읽음
     secure: COOKIE_SECURE,
     sameSite: COOKIE_SAMESITE,
-    domain: COOKIE_DOMAIN,
     path: '/',                 // 모든 경로에서 접근
     maxAge: 24 * 3600 * 1000,
-  } as const;
+  };
+  if (COOKIE_DOMAIN) opts.domain = COOKIE_DOMAIN;
+  return opts;
 }
 
 function clearRefreshCookieOpts() {
   // clearCookie는 Max-Age가 없어도 되고, 속성만 동일하면 삭제됩니다.
-  return {
+  const opts: any = {
     httpOnly: true,
     secure: COOKIE_SECURE,
     sameSite: COOKIE_SAMESITE,
-    domain: COOKIE_DOMAIN,
     path: '/auth',
-  } as const;
+  };
+  if (COOKIE_DOMAIN) opts.domain = COOKIE_DOMAIN;
+  return opts;
 }
 
 @Controller('auth')
@@ -120,13 +123,14 @@ export class AuthController {
     res.clearCookie(RT_COOKIE, clearRefreshCookieOpts());
 
     // (선택) CSRF도 삭제하고 싶다면:
-    res.clearCookie(CSRF_NAME, {
+    const csrfClearOpts: any = {
       httpOnly: false,
       secure: COOKIE_SECURE,
       sameSite: COOKIE_SAMESITE,
-      domain: COOKIE_DOMAIN,
       path: '/',
-    });
+    };
+    if (COOKIE_DOMAIN) csrfClearOpts.domain = COOKIE_DOMAIN;
+    res.clearCookie(CSRF_NAME, csrfClearOpts);
 
     return { ok: true };
   }
@@ -136,5 +140,21 @@ export class AuthController {
   async me(@Req() req: any) {
     const { sub, email, role } = req.user;
     return { id: Number(sub), email, role };
+  }
+
+  @Post('forgot-password')
+  @HttpCode(200)
+  @UseGuards(RateLimitGuard)
+  async forgotPassword(@Body() body: { email: string }) {
+    await this.auth.requestPasswordReset(body.email);
+    return { ok: true, message: 'If the email exists, a reset link has been sent' };
+  }
+
+  @Post('reset-password')
+  @HttpCode(200)
+  @UseGuards(RateLimitGuard)
+  async resetPassword(@Body() body: { token: string; newPassword: string }) {
+    await this.auth.resetPassword(body.token, body.newPassword);
+    return { ok: true, message: 'Password has been reset successfully' };
   }
 }

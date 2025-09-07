@@ -11,10 +11,10 @@ model Answer {
   id         Int       @id @default(autoincrement())
   questionId Int
   authorId   Int
-  title      String?   @db.VarChar(200)
   body       String?   @db.VarChar(1500)
   createdAt  DateTime  @default(now())
   updatedAt  DateTime
+  title      String?   @db.VarChar(200)
   User       User      @relation(fields: [authorId], references: [id])
   Question   Question  @relation(fields: [questionId], references: [id], onDelete: Cascade)
   Comment    Comment[]
@@ -112,6 +112,19 @@ model Follow {
 
   @@unique([followerId, followeeId])
   @@index([followeeId])
+}
+
+model Insight {
+  id        Int      @id @default(autoincrement())
+  authorId  Int
+  topic     String   @db.VarChar(100)
+  title     String   @db.VarChar(200)
+  body      String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  User      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([authorId, createdAt])
 }
 
 model Notification {
@@ -226,17 +239,18 @@ model User {
   updatedAt                      DateTime
   refreshTokenHash               String?
   tokenVersion                   Int                  @default(0)
+  resetToken                     String?              @unique
+  resetTokenExp                  DateTime?
   Answer                         Answer[]
   Comment                        Comment[]
   Concept                        Concept[]
   Follow_Follow_followeeIdToUser Follow[]             @relation("Follow_followeeIdToUser")
   Follow_Follow_followerIdToUser Follow[]             @relation("Follow_followerIdToUser")
+  Insight                        Insight[]
   Notification                   Notification[]
   Profile                        Profile?
   Question                       Question[]
   QuestionSuggestion             QuestionSuggestion[]
-  resetToken     String?   @unique
-  resetTokenExp  DateTime?
 }
 
 enum Notification_type {

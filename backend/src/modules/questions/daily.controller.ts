@@ -1,51 +1,110 @@
 import { Body, Controller, Get, Put, UseGuards, Optional } from '@nestjs/common'
 import { JwtAuthGuard } from '../auth/jwt-auth.guard'
 import { RedisService } from "../../infrastructure/redis/redis.service";
+import { PrismaService } from '../../infrastructure/prisma/prisma.service';
 
-type SetDailyDto = { question: string }
+type SetDailyDto = { questionId: number }
 
 // 내부적으로 Redis 클라이언트를 "최대한" 찾아서 반환
 
-// 메모리 fallback (Redis 미연결/오류 대비)
-let memoryDaily: string | null = null
+// 메모리 fallback (Redis 미연결/오류 대비) 
+let memoryDailyQuestionId: number | null = null
 
-@Controller('questions')
+@Controller('daily')
 export class DailyQuestionController {
-  constructor(@Optional() private readonly redis?: RedisService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Optional() private readonly redis: RedisService | undefined = undefined
+  ) {}
 
-  @Get('daily')
+  @Get('question')
   async getDaily() {
+    console.log('=== GET DAILY QUESTION REQUEST RECEIVED ===');
+    let questionId: number | null = null;
+    
+    // Try to get from Redis first
     try {
       const r = this.redis?.client
       if (r?.get) {
-        const text = await r.get('daily:question')
-        if (text !== null && text !== undefined) {
-          memoryDaily = text
+        const storedId = await r.get('daily:question:id')
+        if (storedId !== null && storedId !== undefined) {
+          questionId = parseInt(storedId);
+          memoryDailyQuestionId = questionId;
         }
-        return { question: text ?? memoryDaily ?? null }
       }
     } catch {}
-    return { question: memoryDaily ?? null }
+    
+    // Fallback to memory
+    if (questionId === null) {
+      questionId = memoryDailyQuestionId;
+    }
+    
+    console.log("questionId:", questionId, "type:", typeof questionId);
+    // If we have a question ID, fetch the question details
+    if (questionId !== null && questionId !== undefined && Number.isInteger(questionId) && questionId > 0) {
+      try {
+        const question = await this.prisma.question.findUnique({
+          where: { id: questionId },
+          include: {
+            User: {
+              select: { email: true }
+            },
+            Category: {
+              select: { name: true }
+            }
+          }
+        });
+        
+        if (question) {
+          return { question };
+        }
+      } catch {}
+    }
+    
+    // No question set or question not found
+    return { question: null };
   }
 
   @UseGuards(JwtAuthGuard)
-  @Put('daily')
+  @Put('question')
   async setDaily(@Body() dto: SetDailyDto) {
-    const q = (dto?.question ?? '').trim()
-    if (!q) return { ok: false }
-    memoryDaily = q
     try {
-      const r = this.redis?.client
-      if (r?.set) {
-        // node-redis v4 옵션 형태 시도
-        try {
-          await r.set('daily:question', q, "EX", 60 * 60 * 24 * 30)
-        } catch {
-          // ioredis 스타일
-          await r.set('daily:question', q, 'EX', 60 * 60 * 24 * 30)
-        }
+      console.log('Setting daily question:', dto);
+      
+      const questionId = dto?.questionId;
+      if (!questionId || !Number.isInteger(questionId) && questionId > 0) {
+        return { ok: false, error: 'Valid questionId is required' };
       }
-    } catch {}
-    return { ok: true }
+      
+      // Verify the question exists
+      const question = await this.prisma.question.findUnique({
+        where: { id: questionId }
+      });
+      if (!question) {
+        return { ok: false, error: 'Question not found' };
+      }
+      
+      console.log('Found question:', question.title);
+      
+      // Store in memory
+      memoryDailyQuestionId = questionId;
+      
+      // Try to store in Redis if available
+      try {
+        const r = this.redis?.client
+        if (r?.set) {
+          await r.set('daily:question:id', questionId.toString(), 'EX', 60 * 60 * 24 * 30)
+          console.log('Stored in Redis successfully');
+        }
+      } catch (redisError) {
+        console.log('Redis storage failed, using memory only:', redisError);
+      }
+      
+      console.log('Daily question set successfully');
+      return { ok: true };
+    } catch (error) {
+      console.error('Error in setDaily:', error);
+      return { ok: false, error: 'Internal server error' };
+    }
   }
 }

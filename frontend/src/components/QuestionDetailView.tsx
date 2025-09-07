@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { getQuestionDetail, getAnswers, createAnswer, type QuestionDetail, type Answer, type CreateAnswerRequest } from '@/api/define';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -12,6 +13,7 @@ interface QuestionDetailViewProps {
 export function QuestionDetailView({ slug, questionId, onClose }: QuestionDetailViewProps) {
   const queryClient = useQueryClient();
   const { accessToken, isAuthed } = useAuth();
+  const navigate = useNavigate();
   const [answerTitle, setAnswerTitle] = useState('');
   const [answerBody, setAnswerBody] = useState('');
   const [showAnswerForm, setShowAnswerForm] = useState(false);
@@ -64,6 +66,31 @@ export function QuestionDetailView({ slug, questionId, onClose }: QuestionDetail
       body: answerBody.trim(),
     });
   };
+
+  // Helper function to get first line of answer body
+  const getFirstLine = (text: string) => {
+    return text.split('\n')[0].substring(0, 100) + (text.length > 100 ? '...' : '');
+  };
+
+  // Helper function to get user's answer number
+  const getUserAnswerNumber = (userId: number) => {
+    const userAnswers = answers.filter(answer => answer.User.id === userId);
+    const sortedUserAnswers = userAnswers.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+    return sortedUserAnswers.length;
+  };
+
+  // Helper function to get current answer number for a user
+  const getCurrentAnswerNumber = (answerId: number, userId: number) => {
+    const userAnswers = answers.filter(answer => answer.User.id === userId);
+    const sortedUserAnswers = userAnswers.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+    return sortedUserAnswers.findIndex(answer => answer.id === answerId) + 1;
+  };
+
+  // Handle answer click to navigate to detail page
+  const handleAnswerClick = (answerId: number) => {
+    navigate(`/define/${slug}/questions/${questionId}/answers/${answerId}`);
+  };
+
 
   if (questionLoading) {
     return (
@@ -159,7 +186,7 @@ export function QuestionDetailView({ slug, questionId, onClose }: QuestionDetail
                 type="text"
                 value={answerTitle}
                 onChange={(e) => setAnswerTitle(e.target.value)}
-                placeholder="답변 제목 (선택사항)"
+                placeholder="답변 제목"
                 className="w-full rounded-md border border-gray-300 px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500"
                 disabled={createAnswerMutation.isPending}
               />
@@ -212,14 +239,35 @@ export function QuestionDetailView({ slug, questionId, onClose }: QuestionDetail
           ) : answers.length > 0 ? (
             <div className="space-y-3">
               {answers.map((answer) => (
-                <div key={answer.id} className="bg-white border border-gray-200 rounded-lg p-4">
-                  {answer.title && (
-                    <h3 className="font-semibold text-gray-900 mb-2">{answer.title}</h3>
-                  )}
-                  <p className="text-gray-800 whitespace-pre-wrap mb-3">{answer.body}</p>
+                <div 
+                  key={answer.id} 
+                  className="bg-white border border-gray-200 rounded-lg p-4 cursor-pointer hover:bg-gray-50 hover:shadow-md transition-all"
+                  onClick={() => handleAnswerClick(answer.id)}
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    {answer.title ? (
+                      <h3 className="font-semibold text-gray-900">{answer.title}</h3>
+                    ) : (
+                      <h3 className="font-semibold text-gray-900">답변</h3>
+                    )}
+                    <span className="text-xs text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full ml-2 flex-shrink-0">
+                      #{getCurrentAnswerNumber(answer.id, answer.User.id)}
+                    </span>
+                  </div>
+                  <p className="text-gray-700 mb-3">
+                    {getFirstLine(answer.body)}
+                  </p>
                   <div className="flex items-center justify-between text-sm text-gray-500">
-                    <span>{answer.User.email}</span>
+                    <div className="flex items-center gap-2">
+                      <span>{answer.User.email}</span>
+                      <span className="text-xs text-gray-400">
+                        ({getUserAnswerNumber(answer.User.id)}개 답변)
+                      </span>
+                    </div>
                     <span>{new Date(answer.createdAt).toLocaleString('ko-KR')}</span>
+                  </div>
+                  <div className="flex items-center justify-end mt-2">
+                    <span className="text-xs text-gray-400">자세히 보기 →</span>
                   </div>
                 </div>
               ))}

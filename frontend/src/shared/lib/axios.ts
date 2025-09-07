@@ -2,7 +2,7 @@ import axios, { AxiosHeaders } from 'axios'
 import { token } from './token'
 
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: 'http://localhost:3000',
   withCredentials: true,
 })
 
@@ -32,6 +32,7 @@ api.interceptors.request.use((config) => {
   return config
 })
 
+// Global refresh state to coordinate with useAuth hook
 let isRefreshing = false
 let waiters: Array<() => void> = []
 
@@ -41,11 +42,12 @@ api.interceptors.response.use(
     const { config, response } = error
     const url = (config?.url || '').toString()
 
-    // refresh/logout 또는 명시적 플래그는 재시도 금지
+    // Skip refresh for certain endpoints or explicit flags
     const skipRefresh =
       (config as any)?._noRefresh ||
       url.includes('/auth/refresh') ||
-      url.includes('/auth/logout')
+      url.includes('/auth/logout') ||
+      url.includes('/auth/me') // Let useAuth handle /auth/me failures
 
     const hasAccess = !!token.get()
 
@@ -56,34 +58,46 @@ api.interceptors.response.use(
     ;(config as any)._retry = true
 
     if (isRefreshing) {
-      await new Promise<void>((res) => waiters.push(res))
+      // Wait for ongoing refresh to complete
+      await new Promise<void>((resolve) => waiters.push(resolve))
     } else {
       isRefreshing = true
       try {
-        // Get CSRF token from cookie for refresh request
-        const getCsrfToken = () => {
-          const match = document.cookie.match(/(?:^|; )X-CSRF-Token=([^;]*)/)
-          return match ? decodeURIComponent(match[1]) : null
+        // Check if token was updated by useAuth hook during this time
+        const currentToken = token.get()
+        if (!currentToken) {
+          // Token hasn't been refreshed by useAuth, do it here
+          const getCsrfToken = () => {
+            const match = document.cookie.match(/(?:^|; )X-CSRF-Token=([^;]*)/)
+            return match ? decodeURIComponent(match[1]) : null
+          }
+          
+          const csrfToken = getCsrfToken()
+          const refreshConfig: any = { 
+            _noRefresh: true,
+            withCredentials: true
+          }
+          
+          if (csrfToken) {
+            refreshConfig.headers = { 'X-CSRF-Token': csrfToken }
+          }
+          
+          const { data } = await api.post('/auth/refresh', {}, refreshConfig)
+          if (data?.accessToken) {
+            token.set(data.accessToken)
+          } else {
+            throw new Error('No access token in refresh response')
+          }
         }
-        
-        const csrfToken = getCsrfToken()
-        const refreshConfig: any = { 
-          _noRefresh: true,
-          withCredentials: true
-        }
-        
-        // Add CSRF token if available
-        if (csrfToken) {
-          refreshConfig.headers = { 'X-CSRF-Token': csrfToken }
-        }
-        
-        const { data } = await api.post('/auth/refresh', {}, refreshConfig)
-        if (data?.accessToken) token.set(data.accessToken)
+        // If token was already refreshed by useAuth, just continue
       } catch (refreshError: any) {
-        // ✅ refresh 실패: 세션 정리 → 이후 요청은 401로 떨어지고 UI는 로그인 유도
-        console.warn('Token refresh failed:', refreshError?.response?.data || refreshError.message)
+        // Refresh failed: clear session
+        console.warn('[Axios] Token refresh failed:', refreshError?.response?.data || refreshError.message)
         token.clear()
-        localStorage.removeItem('authed')
+        
+        // Notify other parts of the app about auth failure
+        window.dispatchEvent(new CustomEvent('auth:refresh-failed'))
+        
         isRefreshing = false
         waiters.forEach((fn) => fn())
         waiters = []
@@ -94,6 +108,13 @@ api.interceptors.response.use(
       waiters = []
     }
 
+    // Check if we have a valid token after refresh
+    const finalToken = token.get()
+    if (!finalToken) {
+      return Promise.reject(error)
+    }
+
+    // Retry the original request with the new token
     return api(config)
   }
 )
