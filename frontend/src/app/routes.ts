@@ -17,6 +17,7 @@ export const PROTECTED_ROUTES = {
   ANALYZE_TOPIC: '/analyze/:slug',
   ANSWER_DETAIL: '/define/:slug/questions/:questionId/answers/:answerId',
   ANALYZE_ANSWER_DETAIL: '/analyze/:slug/questions/:questionId/answers/:answerId',
+  ANSWER_SIMPLE: '/answers/:answerId',
   WRITE: '/write',
   FREE_INSIGHT: '/free-insight',
   TODAYS_QUESTION: '/todays-question',

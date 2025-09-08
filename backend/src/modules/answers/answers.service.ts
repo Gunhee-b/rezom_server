@@ -36,6 +36,22 @@ export class AnswersService {
       include: {
         User: {
           select: { id: true, email: true }
+        },
+        Question: {
+          select: { 
+            id: true, 
+            title: true,
+            QuestionConcept: {
+              select: {
+                Concept: {
+                  select: {
+                    slug: true,
+                    title: true
+                  }
+                }
+              }
+            }
+          }
         }
       }
     });

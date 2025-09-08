@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getAnswers, getQuestionDetail, updateAnswer, deleteAnswer, getAnswerComments, createComment, updateComment, deleteComment, type Answer, type QuestionDetail, type Comment, type CreateCommentRequest } from '@/api/define';
+import { getAnswers, getAnswerById, getQuestionDetail, updateAnswer, deleteAnswer, getAnswerComments, createComment, updateComment, deleteComment, type Answer, type QuestionDetail, type Comment, type CreateCommentRequest } from '@/api/define';
 import { useAuth } from '@/hooks/useAuth';
 import { EditAnswerModal } from '@/components/EditAnswerModal';
 import { DeleteAnswerModal } from '@/components/DeleteAnswerModal';
@@ -27,22 +27,36 @@ export default function AnswerDetailPage() {
   const questionIdNum = questionId ? parseInt(questionId) : 0;
   const answerIdNum = answerId ? parseInt(answerId) : 0;
 
+  // Check if we're using the simple route (only answerId parameter)
+  const isSimpleRoute = !slug && !questionId && answerId;
+  
+  // For simple route, fetch the answer first to get question info
+  const { data: singleAnswer } = useQuery<Answer>({
+    queryKey: ['single-answer', answerIdNum],
+    queryFn: () => getAnswerById(answerIdNum),
+    enabled: isSimpleRoute && !!answerIdNum,
+  });
+  
+  // Extract question info from single answer for simple route
+  const derivedQuestionId = isSimpleRoute ? (singleAnswer as any)?.Question?.id : questionIdNum;
+  const derivedSlug = isSimpleRoute ? (singleAnswer as any)?.Question?.QuestionConcept?.[0]?.Concept?.slug : slug;
+
   // Fetch question details for context
   const { data: question } = useQuery<QuestionDetail>({
-    queryKey: ['question-detail', slug, questionIdNum],
-    queryFn: () => getQuestionDetail(slug!, questionIdNum),
-    enabled: !!slug && !!questionIdNum,
+    queryKey: ['question-detail', derivedSlug, derivedQuestionId],
+    queryFn: () => getQuestionDetail(derivedSlug!, derivedQuestionId),
+    enabled: !!derivedSlug && !!derivedQuestionId,
   });
 
   // Fetch all answers for the question
   const { data: answers, isLoading: answersLoading, error } = useQuery<Answer[]>({
-    queryKey: ['question-answers', questionIdNum],
-    queryFn: () => getAnswers(questionIdNum),
-    enabled: !!questionIdNum,
+    queryKey: ['question-answers', derivedQuestionId],
+    queryFn: () => getAnswers(derivedQuestionId),
+    enabled: !!derivedQuestionId,
   });
 
-  // Find the specific answer
-  const answer = answers?.find(a => a.id === answerIdNum);
+  // Find the specific answer (use single answer for simple route, or find in answers list)
+  const answer = isSimpleRoute ? singleAnswer : answers?.find(a => a.id === answerIdNum);
 
   // Fetch comments for this answer
   const { data: comments = [], isLoading: commentsLoading } = useQuery<Comment[]>({
@@ -57,7 +71,10 @@ export default function AnswerDetailPage() {
       return updateAnswer(id, data, accessToken || undefined);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['question-answers', questionIdNum] });
+      queryClient.invalidateQueries({ queryKey: ['question-answers', derivedQuestionId] });
+      if (isSimpleRoute) {
+        queryClient.invalidateQueries({ queryKey: ['single-answer', answerIdNum] });
+      }
       setEditingAnswer(null);
     },
     onError: (error: any) => {
@@ -71,10 +88,17 @@ export default function AnswerDetailPage() {
       return deleteAnswer(id, accessToken || undefined);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['question-answers', questionIdNum] });
+      queryClient.invalidateQueries({ queryKey: ['question-answers', derivedQuestionId] });
+      if (isSimpleRoute) {
+        queryClient.invalidateQueries({ queryKey: ['single-answer', answerIdNum] });
+      }
       setDeletingAnswer(null);
-      // Navigate back to question detail after deletion
-      navigate(`/define/${slug}?questionId=${questionIdNum}`);
+      // Navigate back to appropriate location after deletion
+      if (isSimpleRoute) {
+        navigate('/users/me/questions');
+      } else {
+        navigate(`/define/${slug}?questionId=${questionIdNum}`);
+      }
     },
     onError: (error: any) => {
       console.error('Answer delete error:', error);

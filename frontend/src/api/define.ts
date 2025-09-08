@@ -127,6 +127,24 @@ export type TopFiveKeyword = {
   rank: number;
 };
 
+// Helper function to extract key terms from question titles
+function extractKeywordFromTitle(title: string): string {
+  // Remove common question patterns and extract the main concept
+  const cleaned = title
+    .replace(/\?+$/, '') // Remove trailing question marks
+    .replace(/^(.+?)(이란|란|는|은|의|이|가)\s*(무엇일까요?|뭐일까요?|무엇인가요?|뭔가요?|뭐에요?)$/i, '$1') // Extract core concept before "이란 무엇일까요?" patterns
+    .replace(/^(.+?)(이란|란|는|은|의|이|가)\s*(.+)$/i, '$1') // Extract first part before particles
+    .trim();
+  
+  // If extraction resulted in something meaningful and shorter, use it
+  if (cleaned.length > 0 && cleaned.length < title.length * 0.7) {
+    return cleaned;
+  }
+  
+  // Otherwise return original title
+  return title;
+}
+
 export async function getKeywords(slug: string): Promise<ConceptKeyword[] | TopFiveKeyword[]> {
   try {
     // First try to get Top-5 questions from the new endpoint
@@ -136,16 +154,22 @@ export async function getKeywords(slug: string): Promise<ConceptKeyword[] | TopF
     
     // Transform to TopFiveKeyword format for consistency
     return top5Data.map(item => ({
-      label: item.title,
+      label: item.keywordLabel || extractKeywordFromTitle(item.title), // Extract keyword from title if keywordLabel not available
       questionId: item.questionId,
       rank: item.rank,
     }));
   } catch (error) {
     // Fallback to the original keywords endpoint
     console.log(`No top5 data for ${slug}, falling back to keywords`);
-    return api<ConceptKeyword[]>(`/define/concepts/${slug}/keywords`, {
+    const conceptKeywords = await api<ConceptKeyword[]>(`/define/concepts/${slug}/keywords`, {
       withCredentials: true,
     });
+    
+    // Also apply keyword extraction to fallback data
+    return conceptKeywords.map(item => ({
+      ...item,
+      keyword: extractKeywordFromTitle(item.keyword),
+    }));
   }
 }
 
@@ -211,6 +235,13 @@ export async function createQuestion(
 // Get answers for a question
 export async function getAnswers(questionId: number): Promise<Answer[]> {
   return api<Answer[]>(`/answers/question/${questionId}`, {
+    withCredentials: true,
+  });
+}
+
+// Get a single answer by ID
+export async function getAnswerById(answerId: number): Promise<Answer> {
+  return api<Answer>(`/answers/${answerId}`, {
     withCredentials: true,
   });
 }

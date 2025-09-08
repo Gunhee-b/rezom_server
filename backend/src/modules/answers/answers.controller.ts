@@ -22,6 +22,11 @@ export class AnswersController {
     return this.svc.getByQuestionId(Number(questionId));
   }
 
+  @Get(':id')
+  getAnswerById(@Param('id') id: string) {
+    return this.svc.findOne(Number(id));
+  }
+
   @UseGuards(JwtAuthGuard)
   @Put(':id')
   async updateAnswer(@Param('id') id: string, @Body() dto: any, @Req() req: AuthedRequest) {

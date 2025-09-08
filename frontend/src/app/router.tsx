@@ -130,6 +130,11 @@ export const router = createBrowserRouter([
         errorElement: <RouteErrorBoundary />,
       },
       {
+        path: PROTECTED_ROUTES.ANSWER_SIMPLE,
+        element: <LazyPage Component={AnswerDetailPage} />,
+        errorElement: <RouteErrorBoundary />,
+      },
+      {
         path: PROTECTED_ROUTES.WRITE,
         element: <LazyPage Component={WritePage} />,
         errorElement: <RouteErrorBoundary />,
