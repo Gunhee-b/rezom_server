@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { setDailyQuestion, purgeCacheScope, updateTop5Questions } from '@/shared/api/admin'
-import { getDailyQuestion, listMyQuestions, type Question } from '@/shared/api/questions'
+import { getDailyQuestion, type Question } from '@/shared/api/questions'
 import { getKeywords, type TopFiveKeyword } from '@/api/define'
+import { api } from '@/shared/lib/axios'
 
 export default function AdminPage() {
   const navigate = useNavigate()
@@ -22,7 +23,10 @@ export default function AdminPage() {
   // Fetch all questions for selection
   const { data: questions, isLoading: questionsLoading } = useQuery({
     queryKey: ['admin-questions'],
-    queryFn: listMyQuestions,
+    queryFn: async () => {
+      const { data } = await api.get('/questions')
+      return data
+    },
   })
 
   // Fetch current analyze-world top 5 questions
