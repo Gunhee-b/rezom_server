@@ -46,7 +46,7 @@ export function useConceptUpdates(
 
     try {
       // Construct the SSE URL
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? '/api' : 'http://localhost:3000');
       const url = `${baseUrl}/define/concepts/${conceptSlug}/updates`;
       
       const eventSource = new EventSource(url);

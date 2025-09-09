@@ -24,7 +24,19 @@ export class UsersService {
         questionId: true,
         createdAt: true,
         Question: {
-          select: { id: true, title: true }
+          select: { 
+            id: true, 
+            title: true,
+            QuestionConcept: {
+              select: {
+                Concept: {
+                  select: {
+                    slug: true
+                  }
+                }
+              }
+            }
+          }
         }
       },
     });

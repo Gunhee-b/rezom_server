@@ -2,7 +2,7 @@ import axios, { AxiosHeaders } from 'axios'
 import { token } from './token'
 
 export const api = axios.create({
-  baseURL: 'http://localhost:3000',
+  baseURL: process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3000',
   withCredentials: true,
 })
 

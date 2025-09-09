@@ -40,11 +40,11 @@ export default function TodaysQuestionPage() {
         id: 'todays:question',
         x: 50,
         y: 70,
-        label: dailyData.question.title.length > 30 
-          ? `${dailyData.question.title.substring(0, 30)}...` 
-          : dailyData.question.title,
+        label: (dailyData.question as any)?.title.length > 30 
+          ? `${(dailyData.question as any)?.title.substring(0, 30)}...` 
+          : (dailyData.question as any)?.title,
         size: 'sm' as const,
-        questionId: dailyData.question.id,
+        questionId: (dailyData.question as any)?.id,
       };
 
       s.nodes.push(questionNode);
@@ -114,7 +114,7 @@ export default function TodaysQuestionPage() {
 
       {/* Mindmap Canvas */}
       <MindmapCanvas 
-        key={`todays-${dailyData?.question?.id || 'none'}`} 
+        key={`todays-${(dailyData?.question as any)?.id || 'none'}`} 
         schema={schema}
         onNodeClick={handleNodeClick}
       />
@@ -133,7 +133,7 @@ export default function TodaysQuestionPage() {
       {showQuestionDetail && dailyData?.question && (
         <QuestionDetailView
           slug="daily" // Use special slug for daily questions
-          questionId={dailyData.question.id}
+          questionId={(dailyData.question as any)?.id}
           onClose={handleQuestionDetailClose}
         />
       )}
@@ -142,7 +142,7 @@ export default function TodaysQuestionPage() {
       {import.meta.env.DEV && (
         <div className="fixed bottom-4 right-4 bg-black bg-opacity-75 text-white p-2 rounded text-xs">
           <div>Today's Question: {dailyData?.question ? 'Set' : 'None'}</div>
-          <div>Question ID: {dailyData?.question?.id || 'N/A'}</div>
+          <div>Question ID: {(dailyData?.question as any)?.id || 'N/A'}</div>
         </div>
       )}
     </div>

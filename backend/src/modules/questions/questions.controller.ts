@@ -4,13 +4,12 @@ import { CreateQuestionDto } from './dto/create-question.dto';
 import { UpdateQuestionDto } from './dto/update-question.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Request } from 'express';
-import { DailyQuestionController } from './daily.controller';
 
 type AuthedRequest = Request & { user?: { sub: number } };
 
 @Controller('questions')
 export class QuestionsController {
-  constructor(private readonly svc: QuestionsService, private readonly dailyController: DailyQuestionController) {}
+  constructor(private readonly svc: QuestionsService) {}
 
   @UseGuards(JwtAuthGuard)
   @Post()
@@ -78,8 +77,4 @@ export class QuestionsController {
     return this.svc.remove(questionId);
   }
 
-  @Get('daily')
-  async getDaily() {
-    return this.dailyController.getDaily();
-  }
 }

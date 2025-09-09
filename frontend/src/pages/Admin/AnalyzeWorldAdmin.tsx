@@ -143,8 +143,8 @@ export default function AnalyzeWorldAdmin() {
                         {index + 1}
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-semibold text-blue-900">{item.title}</h3>
-                        <p className="text-sm text-blue-700 mt-1">{item.content}</p>
+                        <h3 className="font-semibold text-blue-900">{item.label}</h3>
+                        <p className="text-sm text-blue-700 mt-1">Question ID: {item.questionId}</p>
                         <div className="text-xs text-blue-600 mt-2">
                           Question ID: {item.questionId} | Rank: {item.rank}
                         </div>

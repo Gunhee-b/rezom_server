@@ -164,7 +164,7 @@ export default function AnswerDetailPage() {
   };
 
   const handleBackToQuestion = () => {
-    navigate(`/define/${slug}?questionId=${questionIdNum}`);
+    navigate('/define');
   };
 
   const navigateToAnswer = (nextAnswerId: number) => {

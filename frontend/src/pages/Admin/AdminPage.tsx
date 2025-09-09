@@ -260,7 +260,7 @@ export default function AdminPage() {
                               </div>
                             </div>
                             <div className="flex items-center gap-2 ml-4">
-                              {dailyData?.question?.id === question.id && (
+                              {(dailyData?.question as any)?.id === question.id && (
                                 <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                   Daily
                                 </span>
@@ -305,8 +305,8 @@ export default function AdminPage() {
                                 {index + 1}
                               </div>
                               <div className="flex-1">
-                                <h3 className="font-semibold text-purple-900">{item.title}</h3>
-                                <p className="text-sm text-purple-700 mt-1">{item.content}</p>
+                                <h3 className="font-semibold text-purple-900">{item.label}</h3>
+                                <p className="text-sm text-purple-700 mt-1">Question ID: {item.questionId}</p>
                                 <div className="text-xs text-purple-600 mt-2">
                                   Question ID: {item.questionId} | Rank: {item.rank}
                                 </div>
@@ -334,10 +334,10 @@ export default function AdminPage() {
                           <div className="w-2 h-2 bg-green-400 rounded-full"></div>
                           <span className="text-sm font-medium text-green-800">Active</span>
                         </div>
-                        <h4 className="font-semibold text-green-900 mb-2">{dailyData.question.title}</h4>
-                        <p className="text-sm text-green-700">{dailyData.question.body}</p>
+                        <h4 className="font-semibold text-green-900 mb-2">{(dailyData.question as any)?.title || 'Daily Question'}</h4>
+                        <p className="text-sm text-green-700">{(dailyData.question as any)?.body || 'Question content'}</p>
                         <div className="mt-2 text-xs text-green-600">
-                          Question ID: {dailyData.question.id}
+                          Question ID: {(dailyData.question as any)?.id || 'N/A'}
                         </div>
                       </div>
                     ) : (
@@ -371,7 +371,7 @@ export default function AdminPage() {
                             className={`p-4 border rounded-lg cursor-pointer transition-colors ${
                               selectedQuestionId === question.id
                                 ? 'border-blue-500 bg-blue-50'
-                                : dailyData?.question?.id === question.id
+                                : (dailyData?.question as any)?.id === question.id
                                 ? 'border-green-500 bg-green-50'
                                 : 'border-gray-200 hover:border-gray-300'
                             }`}
@@ -387,7 +387,7 @@ export default function AdminPage() {
                                     className="w-4 h-4 text-blue-600"
                                   />
                                   <h4 className="font-medium text-gray-900">{question.title}</h4>
-                                  {dailyData?.question?.id === question.id && (
+                                  {(dailyData?.question as any)?.id === question.id && (
                                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                       Current
                                     </span>
@@ -413,7 +413,7 @@ export default function AdminPage() {
                       <div className="mt-6 flex items-center gap-4">
                         <button
                           onClick={handleSetDailyQuestion}
-                          disabled={setDailyMutation.isPending || selectedQuestionId === dailyData?.question?.id}
+                          disabled={setDailyMutation.isPending || selectedQuestionId === (dailyData?.question as any)?.id}
                           className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         >
                           {setDailyMutation.isPending ? 'Setting...' : 'Set as Today\'s Question'}
@@ -458,8 +458,8 @@ export default function AdminPage() {
                                   {index + 1}
                                 </div>
                                 <div className="flex-1">
-                                  <h4 className="font-semibold text-blue-900">{item.title}</h4>
-                                  <p className="text-sm text-blue-700 mt-1">{item.content}</p>
+                                  <h4 className="font-semibold text-blue-900">{item.label}</h4>
+                                  <p className="text-sm text-blue-700 mt-1">Question ID: {item.questionId}</p>
                                   <div className="text-xs text-blue-600 mt-2">
                                     Question ID: {item.questionId} | Rank: {item.rank}
                                   </div>

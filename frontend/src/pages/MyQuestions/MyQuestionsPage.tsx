@@ -284,13 +284,17 @@ export default function MyQuestionsPage() {
             {insights.map((insight) => (
               <div key={insight.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
                 <div className="flex justify-between items-start">
-                  <div className="flex-1">
+                  <div 
+                    className="flex-1 cursor-pointer" 
+                    onClick={() => navigate(`/answers/${insight.id}`)}
+                    title="통찰 상세보기"
+                  >
                     <div className="mb-2">
                       <span className="inline-block px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">
                         {insight.topic}
                       </span>
                     </div>
-                    <h3 className="font-semibold text-gray-900 mb-2">{insight.title}</h3>
+                    <h3 className="font-semibold text-gray-900 mb-2 hover:text-emerald-600 transition-colors">{insight.title}</h3>
                     <p className="text-gray-700 mb-3 line-clamp-3">{insight.body}</p>
                     <div className="text-sm text-gray-500">
                       {new Date(insight.createdAt).toLocaleString('ko-KR')}
@@ -301,7 +305,10 @@ export default function MyQuestionsPage() {
                   </div>
                   <div className="flex gap-2 ml-4">
                     <button
-                      onClick={() => setEditingInsight(insight)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditingInsight(insight);
+                      }}
                       className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                       title="수정"
                     >
@@ -310,7 +317,10 @@ export default function MyQuestionsPage() {
                       </svg>
                     </button>
                     <button
-                      onClick={() => setDeletingInsight(insight)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeletingInsight(insight);
+                      }}
                       className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       title="삭제"
                     >

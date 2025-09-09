@@ -120,7 +120,7 @@ export function useAuth() {
       }
       try {
         console.log('[useAuth] Validating existing token...');
-        const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+        const baseUrl = import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? '/api' : 'http://localhost:3000');
         const me = await fetch(`${baseUrl}/auth/me`, {
           headers: { Authorization: `Bearer ${accessToken}` },
           credentials: 'include',
